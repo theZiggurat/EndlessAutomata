@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public class CB {
 	
-	public static int index = 0;
+	public static int index = 1;
 	
 	// 500s
 	public static Color[] topBGArr = 

@@ -1,5 +1,7 @@
 package cell.app;
 
+import java.io.InputStream;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.image.Image;
@@ -47,9 +49,6 @@ public class topButton extends Button {
     	setOnMouseClicked(e -> {if(!toggle) {popOut(left? leftButtonDef:topButtonDef);}});
     	setOnMouseEntered(e ->{entered();});
     	setOnMouseExited(e ->{exited();});
-    	
-    	
-    	
 	}
 	
 	public void pushIn(Border b) {
@@ -73,7 +72,7 @@ public class topButton extends Button {
 	}
 
 	public void setImage(String string) {
-		Image i = new Image(string,18,18,false,true);
+		Image i = new Image(string);
 		setGraphic(new ImageView(i));
 		setContentDisplay(ContentDisplay.TOP);
 	}

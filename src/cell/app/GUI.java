@@ -2,6 +2,11 @@ package cell.app;
 
 
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
 import javax.swing.text.html.ImageView;
 
 import cell.data.Grid;
@@ -10,6 +15,7 @@ import javafx.application.Application;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -62,7 +68,7 @@ public class GUI extends Application{
 	
 	public void initialize(Stage mainWindow) {
 		mainWindow.setTitle("Endless Automata");
-		mainWindow.getIcons().add(new Image("file:icon.png"));
+		mainWindow.getIcons().add(new Image("icon.png"));
 		
 		grid = new Grid(CURRENT_RULE);
 		v = new ViewPort(CELL_SIZE, GAME_WIDTH-75, GAME_HEIGHT-50, grid);
@@ -142,7 +148,7 @@ public class GUI extends Application{
         run.setOnAction(e -> {
         	System.out.println("Running");
 		});
-        run.setImage("file:run.png");
+        run.setImage("run.png");
         h.getChildren().add(run);
 		
 		// edit button config
@@ -154,14 +160,14 @@ public class GUI extends Application{
 				editMap = true;
 			}
 		});
-		edit.setImage("file:edit.png");
+		edit.setImage("edit.png");
         h.getChildren().add(edit);
         
         // iterate button config
         iterate.setOnAction(e -> {
         	c.iterate();
 		});
-        iterate.setImage("file:iterate.png");
+        iterate.setImage("iterate.png");
         h.getChildren().add(iterate);
         
         
@@ -171,7 +177,7 @@ public class GUI extends Application{
         	mainWindow.close();
         	reInit();
 		});*/
-        color.setImage("file:color.png");
+        color.setImage("color.png");
         color.setTranslateX(GAME_WIDTH-(85*5));
         h.getChildren().add(color);
         
@@ -179,7 +185,7 @@ public class GUI extends Application{
         exit.setOnAction(e -> {
         	mainWindow.close();
 		});
-        exit.setImage("file:exit.png");
+        exit.setImage("exit.png");
         exit.setTranslateX(GAME_WIDTH-(85*5));
         h.getChildren().add(exit);
 		

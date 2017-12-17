@@ -2,12 +2,14 @@ package cell.app;
 
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.Set;
 
 import cell.data.Cell;
 import cell.data.ViewPort;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -25,8 +27,9 @@ public class MovableCanvas extends Canvas{
 	double translateX;
 	double translateY;
 	
-	Media sound = new Media(new File("click_04.wav").toURI().toString());
-	MediaPlayer mediaPlayer = new MediaPlayer(sound);
+	//File file=new File("click_04.wav");
+	//Media sound = new Media(file.toURI().toString());
+	//MediaPlayer mediaPlayer = new MediaPlayer(sound);
 
 	Font onScreen;
 	GraphicsContext g;
@@ -52,7 +55,7 @@ public class MovableCanvas extends Canvas{
 			
 			if(GUI.editMap) {
 			int [] wow = v.returnTuple(pressedX, pressedY);
-			mediaPlayer.play();
+			//mediaPlayer.play();
 			
 			put(wow);
 			redraw(g);
@@ -60,7 +63,7 @@ public class MovableCanvas extends Canvas{
 		});
 		
 		setOnMouseReleased(e -> {
-			mediaPlayer.stop();
+			//mediaPlayer.stop();
 		});
 		
 		setOnMouseDragged(e ->{
@@ -106,16 +109,7 @@ public class MovableCanvas extends Canvas{
 		});
 	}
 	
-	public void drawCoords(double x, double y, GraphicsContext g) {
-		g.clearRect(0, v.getYsize()-45, 140,45);
-		g.setFill(CB.topHL);
-		g.fillRect(0, v.getYsize()-45, 140,45);
-		g.setFill(CB.deadCell);
-		g.setFont(new Font("Sergoe UI", 13));
-		g.fillText("Mouse: {"+x + ","+ y + "}", 10, v.getYsize()-27.5);
-		lastMouseX = x;
-		lastMouseY = y;
-	}
+	
 	
 	double lastMouseX = 0, lastMouseY = 0;
 	
@@ -126,6 +120,58 @@ public class MovableCanvas extends Canvas{
 			v.addCell(wow);
 			//v.grid.get(wow[0]+" "+wow[1]).fullDebug();
 		}
+	}
+	
+	public void drawBottomBar(GraphicsContext g) {
+		g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-45, v.getXsize(),45);
+		
+		drawCoords(lastMouseX, lastMouseY, g);
+		drawXRange(g);
+		drawYRange(g);
+		
+		g.fillText("Y-Range: ", v.xSize-170, v.getYsize()-28 );
+		
+		
+		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
+				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-290, v.getYsize()-28); 
+		g.fillText("["+new DecimalFormat("#").format(v.startY/v.cellSize)+"-"+
+				new DecimalFormat("#").format((v.startY+v.ySize)/v.cellSize)+"]", v.xSize-110, v.getYsize()-28); 
+		
+		// g.fillText(String.valueOf(v.startX)+"--"+String.valueOf((v.startX+v.xSize)), v.xSize-150, v.ySize-45); 
+		// g.fillText(String.valueOf(v.startY)+"--"+String.valueOf((v.startY+v.ySize)), v.xSize-150, v.ySize-30);	
+	}
+	
+	public void drawXRange(GraphicsContext g) {
+		
+		g.setFill(CB.sideBG);
+		g.fillRect(v.xSize-360, v.getYsize()-45, 1, 45);
+		
+		g.setFill(CB.topHL);
+		g.rect(v.xSize-359, v.getYsize()-45 , 179, 45);
+		
+		g.fillText("X-Range: ", v.xSize-350, v.getYsize()-28 );
+		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
+				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-290, v.getYsize()-28); 
+	}
+	
+	public void drawYRange(GraphicsContext g) {
+		g.setFill(CB.sideBG);
+		g.fillRect(v.xSize-180, v.getYsize()-45, 1, 45);
+	}
+	
+	public void drawCoords(double x, double y, GraphicsContext g) {
+		g.clearRect(0, v.getYsize()-43, 140,45);
+		g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-45, 140,45);
+		g.setFill(CB.sideHL);
+		g.setFont(new Font("Helvetica", 13));
+		g.fillText("Mouse: {"+x + ", "+ y + "}", 10, v.getYsize()-28);
+		g.setFill(CB.sideBG);
+		g.fillRect(140, v.getYsize()-45, 1, 45);
+		
+		lastMouseX = x;
+		lastMouseY = y;
 	}
 	
 	
@@ -150,26 +196,10 @@ public class MovableCanvas extends Canvas{
         	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) - v.getCurrY(), v.cellSize-1, v.cellSize-1);
         }
         
-        g.fillRect(0, 0, 5, 5);
-        
         //**BOTTOM BAR**//
+        drawBottomBar(g);
         
-        g.setFill(CB.topHL);
-		g.fillRect(0, v.getYsize()-45, v.getXsize(),45);
-		
-		drawCoords(lastMouseX, lastMouseY, g);
-		
-		
-        
-        
-        g.setFill(Color.BLACK);
-        g.setFont(new Font("Sergoe UI", 13));
-        g.fillText(String.valueOf(v.startX/v.cellSize)+"--"+String.valueOf((v.startX+v.xSize)/v.cellSize), v.xSize-50, v.ySize-45); 
-        g.fillText(String.valueOf(v.startY/v.cellSize)+"--"+String.valueOf((v.startY+v.ySize)/v.cellSize), v.xSize-50, v.ySize-30);
-        g.fillText(String.valueOf(v.startX)+"--"+String.valueOf((v.startX+v.xSize)), v.xSize-150, v.ySize-45); 
-        g.fillText(String.valueOf(v.startY)+"--"+String.valueOf((v.startY+v.ySize)), v.xSize-150, v.ySize-30);
-        g.fillText(String.valueOf(v.cellSize), 100, 100);
-        g.fillText(String.valueOf(tileRatio), 150, 100);
+       
 	}
 	
 	public void iterate() {
