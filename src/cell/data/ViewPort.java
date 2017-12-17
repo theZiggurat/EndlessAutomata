@@ -1,11 +1,9 @@
-package cell.app;
+package cell.data;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 
 /**
  * 12/14/2017
@@ -16,8 +14,8 @@ import javafx.beans.value.ObservableValue;
 
 public class ViewPort {
 	
-	int startX, startY, cellSize, xSize, ySize;
-	Grid grid;
+	public int startX, startY, cellSize, xSize, ySize;
+	public Grid grid;
 	
 	
 	/**
@@ -91,6 +89,13 @@ public class ViewPort {
 		return ret;
 	}
 	
+	public void addCell(int [] tuple) {
+		Cell c = new Cell(tuple);
+		c.survive();
+		grid.put(tuple[0]+" "+tuple[1], c);
+		grid.updateNeighbors();
+	}
+	
 	public int getCurrX() {
 		return startX;
 	}
@@ -99,10 +104,6 @@ public class ViewPort {
 		return startY;
 	}
 	
-	public void updateSize(int x, int y) {
-		xSize = x;
-		ySize = y;
-	}
 	
 	public void setTileSize(int t) {
 		if (cellSize<5&&t<0) {}
@@ -123,5 +124,26 @@ public class ViewPort {
 		ret[1] = realY/cellSize;
 		return ret;
 	}
+	
+	public void updateSize(int x, int y) {
+		xSize = x;
+		ySize = y;
+	}
+	
+	public int getXsize() {
+		return xSize;
+	}
+	
+	public int getYsize() {
+		return ySize;
+	}
+	
+	public boolean containsKey(int [] tuple) {
+		return grid.ContainsKey(tuple);
+	}
+	
+	public void iterate(){
+		grid.iterate();
+	}
 
-}
+	}

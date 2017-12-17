@@ -3,6 +3,8 @@ package cell.app;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import cell.data.Cell;
+
 public class Ruleset {
 	
 	ArrayList<Integer> survives = new ArrayList<Integer>();

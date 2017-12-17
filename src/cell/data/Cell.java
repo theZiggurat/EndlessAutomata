@@ -1,4 +1,4 @@
-package cell.app;
+package cell.data;
 
 /**
  * 12/14/2017
@@ -54,8 +54,8 @@ public class Cell {
 	 * @return integer tuple for key
 	 */
 	
-	public int[] getKey() {
-		return tuple;
+	public String getKey() {
+		return (tuple[0]+" "+tuple[1]);
 	}
 	
 	/**
