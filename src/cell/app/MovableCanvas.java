@@ -31,6 +31,8 @@ public class MovableCanvas extends Canvas{
 	Font onScreen;
 	GraphicsContext g;
 	
+	double tileRatio = 0;
+	
 	public MovableCanvas(ViewPort v) {
 		this.v = v;
 		
@@ -57,6 +59,10 @@ public class MovableCanvas extends Canvas{
 			}
 		});
 		
+		setOnMouseReleased(e -> {
+			mediaPlayer.stop();
+		});
+		
 		setOnMouseDragged(e ->{
 			if(GUI.editMap) {
 				int [] wow = v.returnTuple(e.getX(), e.getY());
@@ -76,26 +82,42 @@ public class MovableCanvas extends Canvas{
 		
 		this.setOnScroll(e -> {
 			
-			double newX = e.getX();
-			double newY = e.getY();
+			double oldX = e.getX();
+			double oldY = e.getY();
+			double dx, dy;
 			double oldXCoord = v.getCurrX();
 			double oldYCoord = v.getCurrY();
-			double tileRatio = (double) v.cellSize;
+			tileRatio = (double) v.cellSize;
 			
 			if(e.getDeltaY()>0) {v.setTileSize(1);}
 			if(e.getDeltaY()<0&&v.cellSize>7) {v.setTileSize(-1);}
 			
-			tileRatio = ((double)v.cellSize/tileRatio);
-			newX*=1-tileRatio;
-			newY*=1-tileRatio;
+			tileRatio = tileRatio/(double)v.getTileSize();
+			dx = -(tileRatio-1) * oldX;
+			dy = -(tileRatio-1) * oldY;
 			
-			v.translate(oldXCoord + newX,oldYCoord +  newY);
+			v.translate(oldXCoord +dx,oldYCoord+dy);
 			redraw(g);
 		});
 		redraw(g);
+		
+		this.setOnMouseMoved(e ->{
+			drawCoords(e.getX(), e.getY(), g);
+		});
 	}
 	
+	public void drawCoords(double x, double y, GraphicsContext g) {
+		g.clearRect(0, v.getYsize()-45, 140,45);
+		g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-45, 140,45);
+		g.setFill(CB.deadCell);
+		g.setFont(new Font("Sergoe UI", 13));
+		g.fillText("Mouse: {"+x + ","+ y + "}", 10, v.getYsize()-27.5);
+		lastMouseX = x;
+		lastMouseY = y;
+	}
 	
+	double lastMouseX = 0, lastMouseY = 0;
 	
 	
 	
@@ -116,8 +138,8 @@ public class MovableCanvas extends Canvas{
 		
 		//**DEAD CELL**//
 		g.setFill(CB.deadCell);
-        Set<int[]> points =  v.gatherTuples();
-        for(int [] point: points) {
+        Set<double[]> points =  v.gatherTuples();
+        for(double [] point: points) {
         	g.fillRect(point[0]- v.getCurrX(), point[1] - v.getCurrY(), v.cellSize-1, v.cellSize-1);
         }
         
@@ -128,12 +150,26 @@ public class MovableCanvas extends Canvas{
         	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) - v.getCurrY(), v.cellSize-1, v.cellSize-1);
         }
         
-        //**LOCATION**//
+        g.fillRect(0, 0, 5, 5);
+        
+        //**BOTTOM BAR**//
+        
+        g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-45, v.getXsize(),45);
+		
+		drawCoords(lastMouseX, lastMouseY, g);
+		
+		
+        
+        
         g.setFill(Color.BLACK);
-        g.setFont(new Font("Terminal", 13));
-        g.fillText(String.valueOf(v.startX/v.cellSize)+"--"+String.valueOf((v.startX+v.xSize)/v.cellSize), v.xSize-50, v.ySize-30); 
-        g.fillText(String.valueOf(v.startY/v.cellSize)+"--"+String.valueOf((v.startY+v.ySize)/v.cellSize), v.xSize-50, v.ySize-15);
+        g.setFont(new Font("Sergoe UI", 13));
+        g.fillText(String.valueOf(v.startX/v.cellSize)+"--"+String.valueOf((v.startX+v.xSize)/v.cellSize), v.xSize-50, v.ySize-45); 
+        g.fillText(String.valueOf(v.startY/v.cellSize)+"--"+String.valueOf((v.startY+v.ySize)/v.cellSize), v.xSize-50, v.ySize-30);
+        g.fillText(String.valueOf(v.startX)+"--"+String.valueOf((v.startX+v.xSize)), v.xSize-150, v.ySize-45); 
+        g.fillText(String.valueOf(v.startY)+"--"+String.valueOf((v.startY+v.ySize)), v.xSize-150, v.ySize-30);
         g.fillText(String.valueOf(v.cellSize), 100, 100);
+        g.fillText(String.valueOf(tileRatio), 150, 100);
 	}
 	
 	public void iterate() {

@@ -2,6 +2,8 @@ package cell.app;
 
 
 
+import javax.swing.text.html.ImageView;
+
 import cell.data.Grid;
 import cell.data.ViewPort;
 import javafx.application.Application;
@@ -72,12 +74,12 @@ public class GUI extends Application{
 		c = new MovableCanvas(v);
 		mainScreen.getChildren().add(c);
 		
-		/*InnerShadow innerShadow = new InnerShadow();
+		InnerShadow innerShadow = new InnerShadow();
 		innerShadow.setRadius(30);
 		innerShadow.setOffsetY(-10);
 		innerShadow.setBlurType(BlurType.GAUSSIAN);
 	    innerShadow.setColor(Color.BLACK);
-	    mainScreen.setEffect(new InnerShadow());*/
+	    mainScreen.setEffect(new InnerShadow());
 		
 		BorderPane wholeScreen = new BorderPane();
 		
@@ -140,6 +142,7 @@ public class GUI extends Application{
         run.setOnAction(e -> {
         	System.out.println("Running");
 		});
+        run.setImage("file:run.png");
         h.getChildren().add(run);
 		
 		// edit button config
@@ -151,12 +154,14 @@ public class GUI extends Application{
 				editMap = true;
 			}
 		});
+		edit.setImage("file:edit.png");
         h.getChildren().add(edit);
         
         // iterate button config
         iterate.setOnAction(e -> {
         	c.iterate();
 		});
+        iterate.setImage("file:iterate.png");
         h.getChildren().add(iterate);
         
         
@@ -166,6 +171,7 @@ public class GUI extends Application{
         	mainWindow.close();
         	reInit();
 		});*/
+        color.setImage("file:color.png");
         color.setTranslateX(GAME_WIDTH-(85*5));
         h.getChildren().add(color);
         
@@ -173,6 +179,7 @@ public class GUI extends Application{
         exit.setOnAction(e -> {
         	mainWindow.close();
 		});
+        exit.setImage("file:exit.png");
         exit.setTranslateX(GAME_WIDTH-(85*5));
         h.getChildren().add(exit);
 		

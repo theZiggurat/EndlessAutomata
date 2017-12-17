@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class ViewPort {
 	
-	public int startX, startY, cellSize, xSize, ySize;
+	public double cellSize, startX, startY, xSize, ySize;
 	public Grid grid;
 	
 	
@@ -26,7 +26,7 @@ public class ViewPort {
 	 * @param grid Map of cells to interact with
 	 */
 	
-	public ViewPort(int cellSize, int xSize, int ySize, Grid grid){
+	public ViewPort(double cellSize, double xSize, double ySize, Grid grid){
 		this.startX = 0;
 		this.startY = 0;
 		this.cellSize = cellSize;
@@ -42,8 +42,8 @@ public class ViewPort {
 	 */
 	
 	public void translate(double d, double e) {
-		startX = (int) d;
-		startY = (int) e;
+		startX = d;
+		startY = e;
 	}
 	
 	
@@ -56,7 +56,7 @@ public class ViewPort {
 		
 		Set<Cell> ret = new HashSet<Cell>();
 		
-		for(int [] tuple: gatherTuples()) {
+		for(double [] tuple: gatherTuples()) {
 			tuple[0]/=cellSize;
 			tuple[1]/=cellSize;
 			if(grid.containsKey(tuple[0]+" "+tuple[1])) {
@@ -67,27 +67,30 @@ public class ViewPort {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Gathers all top-left verticies of cells that belong on the current screen
+	 * @return Set <double []> that contains all coordinates of on-screen items  
 	 */
 	
-	public Set<int []> gatherTuples(){
-		Set<int []> ret = new HashSet<int []>();
+	public Set<double []> gatherTuples(){
+		Set<double []> ret = new HashSet<double []>();
 		//System.out.println("Here");
 		
-		int renderBeginX = startX - (startX%cellSize)-cellSize;
-		int renderBeginY = startY - (startY%cellSize)-cellSize;
+		double renderBeginX = startX - (startX%cellSize)-cellSize;
+		double renderBeginY = startY - (startY%cellSize)-cellSize;
 		
-		int renderEndX = startX + xSize;
-		int renderEndY = startY + ySize;
+		double renderEndX = startX + xSize;
+		double renderEndY = startY + ySize;
 		
-		for(int X = renderBeginX; X<renderEndX; X+=cellSize) {
-			for(int Y = renderBeginY; Y<renderEndY; Y+=cellSize) {
-				ret.add(new int[] {X,Y});
+		for(double X = renderBeginX; X<renderEndX; X+=cellSize) {
+			for(double Y = renderBeginY; Y<renderEndY; Y+=cellSize) {
+				ret.add(new double[] {X,Y});
 			}
 		}
 		return ret;
 	}
+	
+	
+	
 	
 	public void addCell(int [] tuple) {
 		Cell c = new Cell(tuple);
@@ -96,23 +99,17 @@ public class ViewPort {
 		grid.updateNeighbors();
 	}
 	
-	public int getCurrX() {
-		return startX;
-	}
-	
-	public int getCurrY() {
-		return startY;
-	}
+
 	
 	
-	public void setTileSize(int t) {
-		if (cellSize<5&&t<0) {}
+	public void setTileSize(double d) {
+		if (cellSize<5&&d<0) {}
 		else {
-		cellSize += t;
+		cellSize += d;
 		}
 	}
 	
-	public int getTileSize() {
+	public double getTileSize() {
 		return cellSize;
 	}
 	
@@ -120,8 +117,8 @@ public class ViewPort {
 		int [] ret = new int[] {0,0};
 		int realX = (int) (pressedX + startX);
 		int realY = (int) (pressedY + startY);
-		ret[0] = realX/cellSize;
-		ret[1] = realY/cellSize;
+		ret[0] = realX/(int)cellSize;
+		ret[1] = realY/(int)cellSize;
 		return ret;
 	}
 	
@@ -130,12 +127,20 @@ public class ViewPort {
 		ySize = y;
 	}
 	
-	public int getXsize() {
+	public double getXsize() {
 		return xSize;
 	}
 	
-	public int getYsize() {
+	public double getYsize() {
 		return ySize;
+	}
+	
+	public double getCurrX() {
+		return startX;
+	}
+	
+	public double getCurrY() {
+		return startY;
 	}
 	
 	public boolean containsKey(int [] tuple) {

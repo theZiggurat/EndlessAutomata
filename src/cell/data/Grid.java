@@ -91,13 +91,13 @@ public class Grid extends HashMap<String, Cell>{
 	}
 	
 	
-	public List<Cell> createList(){
+	/*public List<Cell> createList(){
 		Collection<Cell> iterable = values();
 		
 		
 		
 		
-	}
+	}*/
 	
 	public void setNeighbors(Cell c) {
 		

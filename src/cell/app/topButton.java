@@ -1,6 +1,9 @@
 package cell.app;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -36,7 +39,7 @@ public class topButton extends Button {
     	setBorder(left? leftButtonDef:topButtonDef);
     	setPrefHeight(50);
     	setPrefWidth(85);
-    	setFont(new Font("Segoe UI", 15));
+    	setFont(new Font("Segoe UI", 10));
     	setTextFill(Color.web("#ECEFF1"));
     	
     	setOnMousePressed(e -> {if(!toggle) {pushIn(left ? leftButtonPressed:topButtonPressed);}
@@ -67,6 +70,12 @@ public class topButton extends Button {
 	
 	public void exited() {
 		if(!push) {setBackground(Background.EMPTY);}
+	}
+
+	public void setImage(String string) {
+		Image i = new Image(string,18,18,false,true);
+		setGraphic(new ImageView(i));
+		setContentDisplay(ContentDisplay.TOP);
 	}
 	
 	
