@@ -1,7 +1,6 @@
 package cell.app;
 
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Set;
 
@@ -9,36 +8,32 @@ import cell.data.Cell;
 import cell.data.ViewPort;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
+
+/**
+ * 
+ * @author Max Davatelis <theZiggurat>
+ * @version 1.0
+ */
 
 public class MovableCanvas extends Canvas{
 	
-	ViewPort v;
 	
-	double pressedX;
-	double pressedY;
-	double lastX;
-	double lastY;
-	boolean clicked;
-	double translateX;
-	double translateY;
 	
-	//File file=new File("click_04.wav");
-	//Media sound = new Media(file.toURI().toString());
-	//MediaPlayer mediaPlayer = new MediaPlayer(sound);
+	double pressedX, pressedY, lastY, lastX, translateX, translateY, lastMouseX, lastMouseY;
+	boolean clicked, debugBar = true;
 
 	Font onScreen;
 	GraphicsContext g;
+	ViewPort v;
 	
 	double tileRatio = 0;
 	
 	public MovableCanvas(ViewPort v) {
-		this.v = v;
 		
+		this.v = v;
 		this.setWidth(v.xSize);
 		this.setHeight(v.ySize);
 		g = this.getGraphicsContext2D();
@@ -54,25 +49,24 @@ public class MovableCanvas extends Canvas{
 			lastY = v.getCurrY();
 			
 			if(GUI.editMap) {
-			int [] wow = v.returnTuple(pressedX, pressedY);
-			//mediaPlayer.play();
-			
-			put(wow);
-			redraw(g);
+				if(throwCoord(pressedX, pressedY)) {
+					redraw(g);
+				}
 			}
 		});
 		
 		setOnMouseReleased(e -> {
-			//mediaPlayer.stop();
 		});
 		
 		setOnMouseDragged(e ->{
 			if(GUI.editMap) {
-				int [] wow = v.returnTuple(e.getX(), e.getY());
-				System.out.println(wow[0] + " " + wow[1]);
-				lastX = v.getCurrX(); lastY = v.getCurrY();
-				put(wow);
-				redraw(g);
+				lastMouseX = e.getX();
+				lastMouseY = e.getY();
+				if(GUI.editMap) {
+					if(throwCoord(e.getX(), e.getY())) {
+						redraw(g);
+					}
+				}
 			}
 			else{
 				translateX = (e.getX() - pressedX);
@@ -105,78 +99,51 @@ public class MovableCanvas extends Canvas{
 		redraw(g);
 		
 		this.setOnMouseMoved(e ->{
+			if(debugBar) {
 			drawCoords(e.getX(), e.getY(), g);
+			}
 		});
 	}
 	
 	
 	
-	double lastMouseX = 0, lastMouseY = 0;
 	
+	// CLASS HELPER METHODS ----------------------------------------------------------------------------------
 	
-	
-	public void put(int [] wow) {
-		if(!v.containsKey(wow)) {
-			v.addCell(wow);
-			//v.grid.get(wow[0]+" "+wow[1]).fullDebug();
-		}
+	/**
+	 * Throws a coordinate from event or refresh to the viewport
+	 * @param wow Coord
+	 * @return Whether or not the cell was added
+	 */
+	public boolean throwCoord(double x, double y) {
+		double [] tuple = {x,y};
+		return v.catchCoord(tuple);
 	}
 	
-	public void drawBottomBar(GraphicsContext g) {
-		g.setFill(CB.topHL);
-		g.fillRect(0, v.getYsize()-45, v.getXsize(),45);
-		
-		drawCoords(lastMouseX, lastMouseY, g);
-		drawXRange(g);
-		drawYRange(g);
-		
-		g.fillText("Y-Range: ", v.xSize-170, v.getYsize()-28 );
-		
-		
-		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
-				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-290, v.getYsize()-28); 
-		g.fillText("["+new DecimalFormat("#").format(v.startY/v.cellSize)+"-"+
-				new DecimalFormat("#").format((v.startY+v.ySize)/v.cellSize)+"]", v.xSize-110, v.getYsize()-28); 
-		
-		// g.fillText(String.valueOf(v.startX)+"--"+String.valueOf((v.startX+v.xSize)), v.xSize-150, v.ySize-45); 
-		// g.fillText(String.valueOf(v.startY)+"--"+String.valueOf((v.startY+v.ySize)), v.xSize-150, v.ySize-30);	
+	
+	/**
+	 * Method call from GUI or event to step forward one time unit in simulation
+	 */
+	public void iterate() {
+		v.iterate();
+		redraw(g);
 	}
 	
-	public void drawXRange(GraphicsContext g) {
-		
-		g.setFill(CB.sideBG);
-		g.fillRect(v.xSize-360, v.getYsize()-45, 1, 45);
-		
-		g.setFill(CB.topHL);
-		g.rect(v.xSize-359, v.getYsize()-45 , 179, 45);
-		
-		g.fillText("X-Range: ", v.xSize-350, v.getYsize()-28 );
-		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
-				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-290, v.getYsize()-28); 
+	
+	/**
+	 * Refreshes Canvas size to new constraints and updates viewport in the process
+	 */
+	public void resize(double w, double h) {
+		// TODO
 	}
 	
-	public void drawYRange(GraphicsContext g) {
-		g.setFill(CB.sideBG);
-		g.fillRect(v.xSize-180, v.getYsize()-45, 1, 45);
-	}
 	
-	public void drawCoords(double x, double y, GraphicsContext g) {
-		g.clearRect(0, v.getYsize()-43, 140,45);
-		g.setFill(CB.topHL);
-		g.fillRect(0, v.getYsize()-45, 140,45);
-		g.setFill(CB.sideHL);
-		g.setFont(new Font("Helvetica", 13));
-		g.fillText("Mouse: {"+x + ", "+ y + "}", 10, v.getYsize()-28);
-		g.setFill(CB.sideBG);
-		g.fillRect(140, v.getYsize()-45, 1, 45);
-		
-		lastMouseX = x;
-		lastMouseY = y;
-	}
-	
+	// RENDER CANVAS ----------------------------------------------------------------------------------
 	
 	public void redraw(GraphicsContext g) {
-		g.clearRect(0, 0, 1200, 700);
+		g.setFont(Font.font("Helvetica",FontWeight.EXTRA_LIGHT, 13));
+		g.clearRect(0, 0, v.getXsize(), v.getYsize());
+		g.setTextAlign(TextAlignment.CENTER);
 		
 		//**BORDER**//
 		g.setFill(CB.borderCell);
@@ -193,19 +160,62 @@ public class MovableCanvas extends Canvas{
         Set<Cell> seen = v.gatherSeen();
         g.setFill(CB.aliveCell);
         for(Cell c: seen) {
-        	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) - v.getCurrY(), v.cellSize-1, v.cellSize-1);
+        	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) 
+        	- v.getCurrY(), v.cellSize-1, v.cellSize-1);
         }
         
         //**BOTTOM BAR**//
+        if(debugBar) {
         drawBottomBar(g);
-        
+        }
        
 	}
 	
-	public void iterate() {
-		v.iterate();
-		redraw(g);
+	public void drawBottomBar(GraphicsContext g) {
+		g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-35, v.getXsize(),35);
+		
+		drawCoords(lastMouseX, lastMouseY, g);
+		drawXRange(g);
+		drawYRange(g);
 	}
 	
+	public void drawXRange(GraphicsContext g) {
+		
+		g.setFill(CB.sideBG);
+		g.fillRect(v.xSize-170, v.getYsize()-35, 1, 35);
+		
+		g.setFill(CB.sideHL);
+		//g.rect(v.xSize-359, v.getYsize()-45 , 179, 45);
+		
+		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
+				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-130, v.getYsize()-19); 
+	}
+	
+	public void drawYRange(GraphicsContext g) {
+		g.setFill(CB.sideBG);
+		g.fillRect(v.xSize-90, v.getYsize()-35, 1, 35);
+		
+		g.setFill(CB.sideHL);
+		g.fillText("["+new DecimalFormat("#").format(v.startY/v.cellSize)+"-"+
+				new DecimalFormat("#").format((v.startY+v.ySize)/v.cellSize)+"]", v.xSize-50, v.getYsize()-19); 
+	}
+	
+	public void drawCoords(double x, double y, GraphicsContext g) {
+		g.clearRect(0, v.getYsize()-33, 140,45);
+		g.setFill(CB.topHL);
+		g.fillRect(0, v.getYsize()-35, 140,45);
+		g.setFill(CB.sideHL);
+		
+		
+		g.fillText("Mouse: <"+x + ", "+ y + ">", 71.5, v.getYsize()-18);
+		g.setFill(CB.sideBG);
+		g.fillRect(140, v.getYsize()-35, 1, 35);
+		
+		lastMouseX = x;
+		lastMouseY = y;
+	}
+	
+
 
 }

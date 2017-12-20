@@ -41,7 +41,7 @@ public class topButton extends Button {
     	setBorder(left? leftButtonDef:topButtonDef);
     	setPrefHeight(50);
     	setPrefWidth(85);
-    	setFont(new Font("Segoe UI", 10));
+    	setFont(new Font("Segoe UI", 9));
     	setTextFill(Color.web("#ECEFF1"));
     	
     	setOnMousePressed(e -> {if(!toggle) {pushIn(left ? leftButtonPressed:topButtonPressed);}

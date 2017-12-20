@@ -2,29 +2,14 @@ package cell.app;
 
 
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
-import javax.swing.text.html.ImageView;
-
 import cell.data.Grid;
 import cell.data.ViewPort;
 import javafx.application.Application;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Bloom;
 import javafx.scene.effect.BlurType;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -38,7 +23,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -46,7 +31,7 @@ public class GUI extends Application{
 	
 	//top bar: 60 px    side bar: 85 px
 	
-	private Stage mainWindow, exitWindow;
+	private Stage mainWindow;
 	private int GAME_WIDTH = 1285, GAME_HEIGHT = 760, CELL_SIZE = 15;
 	private Ruleset CURRENT_RULE = Ruleset.CONWAYS_GAME_OF_LIFE;
 	Grid grid;
@@ -67,11 +52,13 @@ public class GUI extends Application{
 	}
 	
 	public void initialize(Stage mainWindow) {
+		
+		
 		mainWindow.setTitle("Endless Automata");
 		mainWindow.getIcons().add(new Image("icon.png"));
 		
 		grid = new Grid(CURRENT_RULE);
-		v = new ViewPort(CELL_SIZE, GAME_WIDTH-75, GAME_HEIGHT-50, grid);
+		v = new ViewPort(CELL_SIZE, GAME_WIDTH-85, GAME_HEIGHT-60, grid);
 		
 	
 		VBox sideMenu = initSideMenu();
@@ -81,10 +68,11 @@ public class GUI extends Application{
 		mainScreen.getChildren().add(c);
 		
 		InnerShadow innerShadow = new InnerShadow();
-		innerShadow.setRadius(30);
+		innerShadow.setRadius(10);
+		innerShadow.setOffsetY(-10);
 		innerShadow.setOffsetY(-10);
 		innerShadow.setBlurType(BlurType.GAUSSIAN);
-	    innerShadow.setColor(Color.BLACK);
+	    innerShadow.setColor(CB.aliveCell);
 	    mainScreen.setEffect(new InnerShadow());
 		
 		BorderPane wholeScreen = new BorderPane();
@@ -93,16 +81,10 @@ public class GUI extends Application{
 		wholeScreen.setLeft(sideMenu);
 		wholeScreen.setCenter(mainScreen);
 		
-		/*wholeScreen.setBorder(new Border(new BorderStroke(CB.topHL, 
-				BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(10, 3, 3,3))));*/
-		
-		
 		Scene main = new Scene(wholeScreen, GAME_WIDTH, GAME_HEIGHT);
 		mainWindow.setScene(main);
-		mainWindow.setResizable(true);
 		mainWindow.initStyle(StageStyle.TRANSPARENT);
 		mainWindow.show();
-		
 	}
 	
 	public void reInit() {
@@ -144,14 +126,22 @@ public class GUI extends Application{
 			firstSample = true;
 		});
 		
-		// run button config
+		
+		h.setOnMouseClicked(e -> {
+			if(e.getClickCount()>=2) {
+				fullScreen();
+			}
+		});
+		
+		// run button config ----------------------
         run.setOnAction(e -> {
         	System.out.println("Running");
 		});
         run.setImage("run.png");
         h.getChildren().add(run);
 		
-		// edit button config
+        
+		// edit button config --------------------
 		edit.setOnAction(e -> {
 			if(editMap) {
 				editMap = false;
@@ -163,7 +153,9 @@ public class GUI extends Application{
 		edit.setImage("edit.png");
         h.getChildren().add(edit);
         
-        // iterate button config
+        
+        
+        // iterate button config -----------------
         iterate.setOnAction(e -> {
         	c.iterate();
 		});
@@ -171,17 +163,21 @@ public class GUI extends Application{
         h.getChildren().add(iterate);
         
         
-        // exit button config
-        /*color.setOnAction(e -> {
+        
+        
+        // color button config -------------------
+        color.setOnAction(e -> {
         	CB.switchContext();
         	mainWindow.close();
         	reInit();
-		});*/
+		});
         color.setImage("color.png");
         color.setTranslateX(GAME_WIDTH-(85*5));
         h.getChildren().add(color);
         
-        // exit button config
+        
+        
+        // exit button config ------------------
         exit.setOnAction(e -> {
         	mainWindow.close();
 		});
@@ -195,6 +191,7 @@ public class GUI extends Application{
 		h.setBorder(topBorder1);
 		h.setBackground(topBackground);
 		h.setPrefHeight(70);
+		
 		return h;
 	}
 	
@@ -212,6 +209,12 @@ public class GUI extends Application{
 
 	public static void setTop(double d) {
 		top.setText(String.valueOf(d));
+	}
+	
+	public void fullScreen() {
+		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+		mainWindow.setMaxHeight(bounds.getHeight());
+		mainWindow.setMaximized(!mainWindow.isMaximized());
 	}
 }
 

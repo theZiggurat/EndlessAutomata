@@ -57,10 +57,12 @@ public class ViewPort {
 		Set<Cell> ret = new HashSet<Cell>();
 		
 		for(double [] tuple: gatherTuples()) {
+			
 			tuple[0]/=cellSize;
 			tuple[1]/=cellSize;
-			if(grid.containsKey(tuple[0]+" "+tuple[1])) {
-				ret.add(grid.get(tuple[0]+" "+tuple[1]));
+			
+			if(containsKey(tuple)) {
+				ret.add(grid.Get(convert(tuple)));
 			}
 		}
 		return ret;
@@ -89,43 +91,85 @@ public class ViewPort {
 		return ret;
 	}
 	
+	/**
+	 * For interfacing with canvas for the purpose of inserting cells
+	 * @param tuple
+	 * @return
+	 */
 	
+	public boolean catchCoord(double [] tuple) {
+		tuple = returnTuple(tuple);
+		int [] gridCoord = convert(tuple);
+		if(!grid.ContainsKey(gridCoord)) {
+			addCell(gridCoord);
+			return true;
+		}
+		return false;
+	}
 	
 	
 	public void addCell(int [] tuple) {
-		Cell c = new Cell(tuple);
-		c.survive();
-		grid.put(tuple[0]+" "+tuple[1], c);
-		grid.updateNeighbors();
+		grid.Put(tuple);
+		grid.Get(tuple).survive();
+		grid.changed();
 	}
 	
-
-	
-	
+	/**
+	 * Changes tile size for the purpose of zooming in and out
+	 * @param d TileSize
+	 */
 	public void setTileSize(double d) {
 		if (cellSize<5&&d<0) {}
-		else {
-		cellSize += d;
-		}
+		else {cellSize += d;}
 	}
 	
-	public double getTileSize() {
-		return cellSize;
+	/**
+	 * Converts from double tuple used in canvas to int tuple used in grid
+	 * @param tuple Double coordinates
+	 * @return Integer coordinates
+	 */
+	
+	public int [] convert(double [] tuple) {
+		int [] convert = new int[2];
+		convert[0] = (int) Math.floor(tuple[0]);
+		convert[1] = (int) Math.floor(tuple[1]);
+		return convert;
 	}
 	
-	public int [] returnTuple(double pressedX, double pressedY) {
-		int [] ret = new int[] {0,0};
-		int realX = (int) (pressedX + startX);
-		int realY = (int) (pressedY + startY);
-		ret[0] = realX/(int)cellSize;
-		ret[1] = realY/(int)cellSize;
+	/**
+	 * Maps canvas coordinates to viewport coordinates
+	 * @param pressedX X location on canvas
+	 * @param pressedY Y location on canvas
+	 * @return canvas coordinate mapped to viewport
+	 */
+	
+	public double [] returnTuple(double[] tuple) {
+		double [] ret = new double[2];
+		ret[0] = (tuple[0] + startX)/cellSize;
+		ret[1] = (tuple[1] + startY)/cellSize;
 		return ret;
 	}
+	
+	/**
+	 * Changes size of viewpane 
+	 * @param x Width
+	 * @param y Height
+	 */
 	
 	public void updateSize(int x, int y) {
 		xSize = x;
 		ySize = y;
 	}
+	
+	/**
+	 * Iterate function to be called from canvas
+	 */
+	public void iterate(){
+		grid.iterate();
+	}
+	
+	// SETTERS AND GETTERS
+	
 	
 	public double getXsize() {
 		return xSize;
@@ -143,12 +187,12 @@ public class ViewPort {
 		return startY;
 	}
 	
-	public boolean containsKey(int [] tuple) {
-		return grid.ContainsKey(tuple);
+	public boolean containsKey(double [] tuple) {
+		return grid.ContainsKey(convert(tuple));
 	}
 	
-	public void iterate(){
-		grid.iterate();
+	public double getTileSize() {
+		return cellSize;
 	}
 
-	}
+}
