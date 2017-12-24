@@ -3,8 +3,6 @@ package cell.data;
 import java.util.HashSet;
 import java.util.Set;
 
-
-
 /**
  * 12/14/2017
  * ViewPort.java
@@ -91,6 +89,14 @@ public class ViewPort {
 		return ret;
 	}
 	
+	
+	public double[] topLeft(){
+		double [] ret = new double[2];
+		ret[0] = startX - (startX%cellSize)-cellSize;
+		ret[1] = startY - (startY%cellSize)-cellSize;
+		return ret;
+	}
+	
 	/**
 	 * For interfacing with canvas for the purpose of inserting cells
 	 * @param tuple
@@ -103,6 +109,10 @@ public class ViewPort {
 		if(!grid.ContainsKey(gridCoord)) {
 			addCell(gridCoord);
 			return true;
+		}
+		else{
+			grid.remove(gridCoord[0]+""+gridCoord[1]);
+			addCell(gridCoord);
 		}
 		return false;
 	}

@@ -2,6 +2,7 @@ package cell.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,45 +51,39 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 			if(c.getAge()!=-1) { //initially alive
 				if(Rules.survives(c)) {
 					c.survive();
-					System.out.println("Survive: "+ c.getKey());
 				}
 				else {
 					c.kill();
 					remove(c.getKey());
-					System.out.println("Died: "+c.getKey());
 				}
 			}
 			
 			else { //initially dead
 				if(Rules.born(c)) {
 					c.survive();
-					System.out.println("Born: "+ c.getKey());
+				}
+				else{
+					remove(c.getKey());
 				}
 			}
-		i.remove();
 		}
-		updateNeighborsAll();
 	}
 	
 	public void updateNeighborsAll() {
 		Set<Cell> set = buildSet();
 		Iterator<Cell> iter = set.iterator();
-		Iterator<Cell> debug = set.iterator();
 		
-		while(debug.hasNext()) {debug.next().debug();}
 		Cell curr; int neighbors;
 		
 		while(iter.hasNext()) {
 			curr = iter.next();
-			iter.remove();
 			neighbors = 0;
 			
-			for(Cell neighbor: gatherDirectNeighbors(curr)) {
+			for(Cell neighbor: gatherDirectNeighbors(curr, false)) {
 				if(neighbor.getAge()!=-1) {neighbors++;}
-				//System.out.println(neighbor.getKey());
 			}
-			System.out.println(curr.getKey()+ " : "+neighbors);
 			curr.setNeighbors(neighbors);
+			put(curr.getKey(), curr);
 		}
 	}
 	
@@ -100,7 +95,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	
 	public void updateNeighborsOnClick(Cell c) {
 		int neighbors = 0;
-		for(Cell neighbor: gatherDirectNeighbors(c)) {
+		for(Cell neighbor: gatherDirectNeighbors(c, true)) {
 			if(neighbor.getAge()!=-1) {neighbors++;}
 			neighbor.setNeighbors(neighbor.getNeighbors()+1);
 		}
@@ -114,18 +109,19 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 */
 	public Set<Cell> buildSet() {
 	
-		Set <Cell> ret = values().stream().collect(Collectors.toSet());
+		Set <Cell> ret = new HashSet<Cell>();
+		Collection<Cell> forIterating = new HashSet<Cell>();
+		ret.addAll(values().stream().collect(Collectors.toSet()));
+		forIterating.addAll(values().stream().collect(Collectors.toSet()));
 		
-		Iterator<Cell> iter = values().iterator();
+		
+		Iterator<Cell> iter = forIterating.iterator();
 		
 		while(iter.hasNext()) {
 			Cell curr = iter.next();
-			iter.remove();
-			for(Cell q: gatherDirectNeighbors(curr)) {
-				System.out.println(ret.add(q));
-				q.fullDebug();
+			for(Cell q: gatherDirectNeighbors(curr, true)) {
+				ret.add(q);
 			}
-			//System.out.println("Set built");
 		}
 		return ret;
 		
@@ -140,20 +136,22 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 * @return ArrayList of cells that are the neighbors
 	 */
 	
-	public Cell [] gatherDirectNeighbors(Cell c) {
+	public ArrayList<Cell> gatherDirectNeighbors(Cell c, boolean create) {
 		
-		Cell [] ret = new Cell[8];
+		ArrayList<Cell> ret = new ArrayList<Cell>();
 		
 		int [] grabFrom = {-1,-1,-1,0,-1,1,0,-1,0,1,1,-1,1,0,1,1};
-		int [] tuple = new int[2];
 		
 		for(int i = 0; i<16; i++) {
-			tuple[0] = grabFrom[i] + c.getX(); i++;
-			tuple[1] = grabFrom[i] + c.getY();
-			ret[i/2] = GetOrAdd(tuple);
-			System.out.println(i/2);
+			int m = grabFrom[i] + c.getX(); i++;
+			int n = grabFrom[i] + c.getY();
+			int [] tuple = {m,n};
+			
+			if (create){ret.add(GetOrAdd(tuple));}
+			else{Cell add = Get(tuple);
+			if(add!=null){ret.add(add);}
+			}
 		}
-		for(Cell q:ret) {q.debug();}
 		return ret;
 	}
 	
@@ -197,24 +195,30 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 */
 	public Cell GetOrAdd(int [] tuple) {
 		if(!ContainsKey(tuple)) {
-			//System.out.println("PUTTING: ");
 			Put(tuple);
-			Get(tuple).fullDebug();
 		}
-		
 		return Get(tuple);
 	}
+	
+	
+	public void changeRules(Ruleset r){
+		Rules = r;
+	}
+	
 	
 	public void changed() {
 		changed = true;
 	}
 	
-
+	
 	/**
 	 * Prints to the console for debugging purposes
 	 */
 	public void debug() {
 		System.out.println("Total Cells: "+size());
+		for(Cell c: this.values()){
+			c.fullDebug();
+		}
 	}
 	
 	

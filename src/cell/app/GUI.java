@@ -1,13 +1,12 @@
 package cell.app;
 
-
-
 import cell.data.Grid;
 import cell.data.ViewPort;
 import javafx.application.Application;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
@@ -33,7 +32,7 @@ public class GUI extends Application{
 	
 	private Stage mainWindow;
 	private int GAME_WIDTH = 1285, GAME_HEIGHT = 760, CELL_SIZE = 15;
-	private Ruleset CURRENT_RULE = Ruleset.CONWAYS_GAME_OF_LIFE;
+	private Ruleset CURRENT_RULE = Ruleset.GNARL;
 	Grid grid;
 	StringProperty sizeX;
 	ViewPort v;
@@ -201,7 +200,15 @@ public class GUI extends Application{
 
 	private VBox initSideMenu() {
 		VBox v = new VBox();
-		//v.setBorder(topBorder);
+		
+		Button heatMap = new Button("Heatmap");
+		
+		// exit button config ------------------
+        heatMap.setOnAction(e -> {
+        	c.toggleHeat();
+		});
+        
+        v.getChildren().add(heatMap);
 		v.setBackground(sideBackground);
 		v.setPrefWidth(85);
 		return v;

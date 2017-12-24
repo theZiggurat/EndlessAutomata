@@ -1,6 +1,5 @@
 package cell.app;
 
-import java.io.InputStream;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
