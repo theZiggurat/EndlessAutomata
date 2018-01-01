@@ -15,7 +15,11 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-
+/**
+ * I don't know CSS (sad, right?) so this is the way I stylize my buttons
+ * @author Max Davatelis 
+ *
+ */
 
 public class topButton extends Button {
 	

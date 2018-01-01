@@ -13,7 +13,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
 /**
- * 
+ * Infinitely scrolling canvas that ties with viewport to provide a grid that remembers cell position
  * @author Max Davatelis <theZiggurat>
  * @version 1.0
  */
@@ -30,6 +30,11 @@ public class MovableCanvas extends Canvas{
 	ViewPort v;
 	
 	double tileRatio = 0;
+	
+	/**
+	 * Object for the grid. May provide a secondary one for 
+	 * @param v
+	 */
 	
 	public MovableCanvas(ViewPort v) {
 		
@@ -84,7 +89,7 @@ public class MovableCanvas extends Canvas{
 			double tilesY = v.getCurrY()/oldTileSize;
 			
 			if(e.getDeltaY()>0) {v.setTileSize(1);}
-			if(e.getDeltaY()<0&&v.cellSize>7) {v.setTileSize(-1);}
+			if(e.getDeltaY()<0&&v.cellSize>3) {v.setTileSize(-1);}
 			
 			double addX = (1-(oldTileSize/v.getTileSize())) * v.getXsize();
 			double addY = (1-(oldTileSize/v.getTileSize())) * v.getYsize();

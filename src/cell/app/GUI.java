@@ -26,6 +26,23 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+// TODO: 
+//  Grid button
+//	Rule swticher/editor
+//	Proper zoom
+//	Stats page
+//  Peek button
+//  Save stage
+//  Load stage (maybe in the form of a snapshot feature)
+//	Better editing tools (blueprint or click&drag for square)
+//  Maybe actually getting the run to work w/ FPS counter
+//  Resizing implemented
+//
+//..2D automata scene with render configurations
+//  More expansive rulesets
+//	Mobile port
+//  
+
 public class GUI extends Application{
 	
 	//top bar: 60 px    side bar: 85 px
