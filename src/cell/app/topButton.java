@@ -66,6 +66,12 @@ public class topButton extends Button {
 		push = false;
 	}
 	
+	public void popOutDef() {
+		setBorder(topButtonDef);
+		setBackground(Background.EMPTY);
+		push = false;
+	}
+	
 	public void entered() {
 		setBackground(hover);
 	}

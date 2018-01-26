@@ -26,7 +26,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	private static final long serialVersionUID = 1L;
 	private boolean changed = false;
 	ArrayList<Cell> retArr = new ArrayList<Cell>();
-	Ruleset Rules;
+	static Ruleset Rules;
 	
 	/**
 	 * Holds all the existing cells that are interesting for interations (is alive
@@ -35,7 +35,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 */
 	
 	public Grid(Ruleset Rules) {
-		this.Rules = Rules;
+		Grid.Rules = Rules;
 	}
 	
 	
@@ -200,8 +200,11 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 		return Get(tuple);
 	}
 	
+	public void clearAll() {
+		clear();
+	}
 	
-	public void changeRules(Ruleset r){
+	public static void changeRules(Ruleset r){
 		Rules = r;
 	}
 	

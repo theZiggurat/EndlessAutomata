@@ -4,10 +4,15 @@ import cell.data.Grid;
 import cell.data.ViewPort;
 import javafx.application.Application;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
@@ -22,6 +27,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -49,7 +55,9 @@ public class GUI extends Application{
 	
 	private Stage mainWindow;
 	private int GAME_WIDTH = 1285, GAME_HEIGHT = 760, CELL_SIZE = 15;
-	private Ruleset CURRENT_RULE = Ruleset.GNARL;
+	private static Ruleset CURRENT_RULE = Ruleset.CONWAYS_GAME_OF_LIFE;
+	private static SelectorCanvas s1;
+	private static SelectorCanvas s2;
 	Grid grid;
 	StringProperty sizeX;
 	ViewPort v;
@@ -125,7 +133,7 @@ public class GUI extends Application{
 		topButton edit = new topButton("Edit", true, false);
 		topButton iterate = new topButton("Iterate", false, false);
 		topButton exit = new topButton("Exit", false, true);
-		topButton color = new topButton("Color", false, true);
+		topButton clear = new topButton("Clear", false, true);
 		
 		h.setOnMouseDragged(e -> {
 			
@@ -178,18 +186,44 @@ public class GUI extends Application{
         iterate.setImage("iterate.png");
         h.getChildren().add(iterate);
         
+        topButton heatMap = new topButton("Heatmap", true, false);
+        topButton age = new topButton("Age", true, false);
+		
+		// heat button config ------------------
+        heatMap.setOnAction(e -> {
+        	if(c.isAge()) {
+        		c.toggleAge();
+        		age.popOutDef();
+        	}
+        	c.toggleHeat();
+		});
+        //heatMap.setImage("heatMap.png");
+        h.getChildren().add(heatMap);
         
+        
+        
+        
+        // age button config --------------------
+        age.setOnAction(e ->{
+        	if(c.isHeat()) {
+        		c.toggleHeat();
+        		heatMap.popOutDef();
+        	}
+        	c.toggleAge();
+        });
+        //age.setImage("age.png");
+        h.getChildren().add(age);
+       
         
         
         // color button config -------------------
-        color.setOnAction(e -> {
-        	CB.switchContext();
-        	mainWindow.close();
-        	reInit();
+        clear.setOnAction(e -> {
+        	grid.clearAll();
+        	c.redraw(c.getGraphicsContext2D());
 		});
-        color.setImage("color.png");
-        color.setTranslateX(GAME_WIDTH-(85*5));
-        h.getChildren().add(color);
+        clear.setImage("clear.png");
+        clear.setTranslateX(GAME_WIDTH-(85*7));
+        h.getChildren().add(clear);
         
         
         
@@ -198,7 +232,7 @@ public class GUI extends Application{
         	mainWindow.close();
 		});
         exit.setImage("exit.png");
-        exit.setTranslateX(GAME_WIDTH-(85*5));
+        exit.setTranslateX(GAME_WIDTH-(85*7));
         h.getChildren().add(exit);
 		
 		
@@ -218,14 +252,69 @@ public class GUI extends Application{
 	private VBox initSideMenu() {
 		VBox v = new VBox();
 		
-		Button heatMap = new Button("Heatmap");
 		
-		// exit button config ------------------
-        heatMap.setOnAction(e -> {
-        	c.toggleHeat();
-		});
         
-        v.getChildren().add(heatMap);
+        Label l1 = new Label("Ruleset");
+        l1.setTranslateX(25);
+        l1.setTranslateY(5);
+        l1.setFont(new Font("Segoe UI", 10));
+    	l1.setTextFill(CB.deadCell);
+    	
+    	Label l2 = new Label("Configuration");
+        l2.setTranslateX(10);
+        l2.setTranslateY(12);
+        l2.setPadding(new Insets(3));
+        l2.setFont(new Font("Segoe UI", 10));
+    	l2.setTextFill(CB.deadCell);
+    	
+    	Label l3 = new Label("Tiling");
+        l3.setTranslateX(25);
+        l3.setTranslateY(5);
+        l3.setFont(new Font("Segoe UI", 10));
+    	l3.setTextFill(CB.deadCell);
+    	
+        ScrollableCanvas c = new ScrollableCanvas(Ruleset.allRules);
+        c.setTranslateX(5);
+        c.setTranslateY(10);
+        
+        HBox selector = new HBox();
+        VBox buttons = new VBox();
+        buttons.setPrefWidth(25);
+        buttons.setMinWidth(25);
+        
+        Button save = new Button("Save");
+        Button reset = new Button("Reset");
+        
+        buttons.setTranslateX(10);
+        
+        save.resize(25, 30);
+        reset.resize(25, 30);
+        
+        save.setBackground(sideBackground);
+        reset.setBackground(sideBackground);
+        
+        
+        
+        
+        reset.setTranslateY(15);
+        
+        buttons.getChildren().addAll(save, reset);
+        
+        s1 = new SelectorCanvas(CURRENT_RULE.survives);
+        s2 = new SelectorCanvas(CURRENT_RULE.born);
+        s2.setTranslateX(5);
+   
+        selector.getChildren().addAll(s1,s2, buttons);
+        selector.setPadding(new Insets(15, 5, 5, 5));
+        
+        // TODO: CHANGE CELL FILL
+        
+        TileCanvas tiler = new TileCanvas();
+        tiler.setTranslateX(5);
+        tiler.setTranslateY(12);
+        
+        
+        v.getChildren().addAll(l1, c, l2, selector, l3, tiler);
 		v.setBackground(sideBackground);
 		v.setPrefWidth(85);
 		return v;
@@ -239,6 +328,13 @@ public class GUI extends Application{
 		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 		mainWindow.setMaxHeight(bounds.getHeight());
 		mainWindow.setMaximized(!mainWindow.isMaximized());
+	}
+	
+	public static void changeRule(Ruleset r) {
+		CURRENT_RULE = r;
+		Grid.changeRules(CURRENT_RULE);
+		s1.switchRule(r.survives);
+		s2.switchRule(r.born);
 	}
 }
 
