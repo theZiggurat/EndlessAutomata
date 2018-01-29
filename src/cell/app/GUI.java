@@ -43,6 +43,7 @@ import javafx.stage.StageStyle;
 //	Better editing tools (blueprint or click&drag for square)
 //  Maybe actually getting the run to work w/ FPS counter
 //  Resizing implemented
+//  Wall drawing
 //
 //..2D automata scene with render configurations
 //  More expansive rulesets

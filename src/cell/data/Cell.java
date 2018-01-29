@@ -4,7 +4,7 @@ package cell.data;
  * 12/14/2017
  * Cell.java
  * @author Maximillian_Davatelis <theZiggurat>
- * @version 1.0
+ * @version 1.1
  */
 
 public class Cell {
@@ -89,7 +89,9 @@ public class Cell {
 		return neighbors;
 	}
 	
-	
+	/**
+	 * Returns location, age, and neighbors of input cell in console
+	 */
 	public void fullDebug() {
 		System.out.print("X: " + tuple[0]+",");
 		System.out.print("Y: " + tuple[1]+",");
@@ -97,6 +99,9 @@ public class Cell {
 		System.out.println("Neighbors: " + neighbors);
 	}
 	
+	/**
+	 * Returns key of input cell in console
+	 */
 	public void debug() {
 		System.out.println("{"+tuple[0]+","+tuple[1]+"}");
 	}

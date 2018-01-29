@@ -7,7 +7,7 @@ import java.util.Set;
  * 12/14/2017
  * ViewPort.java
  * @author Maximillian Davatelis <theZiggurat>
- * @version 1.0
+ * @version 1.1
  */
 
 public class ViewPort {
@@ -89,11 +89,14 @@ public class ViewPort {
 		return ret;
 	}
 	
-	
+	/**
+	 * Returns x and y coordinate of first location where gridlines should be drawn
+	 * @return x and y of render start
+	 */
 	public double[] topLeft(){
 		double [] ret = new double[2];
-		ret[0] = startX - (startX%cellSize)-cellSize;
-		ret[1] = startY - (startY%cellSize)-cellSize;
+		ret[0] = startX - (startX%cellSize) - cellSize;
+		ret[1] = startY - (startY%cellSize) - cellSize;
 		return ret;
 	}
 	
@@ -118,11 +121,18 @@ public class ViewPort {
 	}
 	
 	
+	
+	/**
+	 * 
+	 * @param tuple
+	 */
 	public void addCell(int [] tuple) {
 		grid.Put(tuple);
 		grid.Get(tuple).survive();
 		grid.changed();
 	}
+	
+	
 	
 	/**
 	 * Changes tile size for the purpose of zooming in and out
@@ -132,6 +142,7 @@ public class ViewPort {
 		if (cellSize<5&&d<0) {}
 		else {cellSize += d;}
 	}
+	
 	
 	/**
 	 * Converts from double tuple used in canvas to int tuple used in grid
@@ -145,6 +156,7 @@ public class ViewPort {
 		convert[1] = (int) Math.floor(tuple[1]);
 		return convert;
 	}
+	
 	
 	/**
 	 * Maps canvas coordinates to viewport coordinates
@@ -160,6 +172,7 @@ public class ViewPort {
 		return ret;
 	}
 	
+	
 	/**
 	 * Changes size of viewpane 
 	 * @param x Width
@@ -170,6 +183,7 @@ public class ViewPort {
 		xSize = x;
 		ySize = y;
 	}
+	
 	
 	/**
 	 * Iterate function to be called from canvas
@@ -197,12 +211,18 @@ public class ViewPort {
 		return startY;
 	}
 	
-	public boolean containsKey(double [] tuple) {
-		return grid.ContainsKey(convert(tuple));
-	}
-	
 	public double getTileSize() {
 		return cellSize;
+	}
+	
+	
+	/**
+	 * Returns true if containing grid contains alive cell at input location
+	 * @param tuple location of cell
+	 * @return boolean if cell is there or not
+	 */
+	public boolean containsKey(double [] tuple) {
+		return grid.ContainsKey(convert(tuple));
 	}
 
 }
