@@ -89,6 +89,7 @@ public class GUI extends Application{
 		VBox sideMenu = initSideMenu();
 		HBox topMenu = initTopMenu();
 		Pane mainScreen = new Pane();
+		mainScreen.setBackground(topBackground);
 		c = new MovableCanvas(v);
 		mainScreen.getChildren().add(c);
 		

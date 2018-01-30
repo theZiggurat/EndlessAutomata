@@ -39,8 +39,8 @@ public class MovableCanvas extends Canvas{
 	public MovableCanvas(ViewPort v) {
 		
 		this.v = v;
-		this.setWidth(v.xSize);
-		this.setHeight(v.ySize);
+		this.setWidth(v.getXsize());
+		this.setHeight(v.getYsize());
 		g = this.getGraphicsContext2D();
 		
 		
@@ -88,7 +88,7 @@ public class MovableCanvas extends Canvas{
 			double preYTiles = v.getYsize()/v.getTileSize();*/
 			
 			if(e.getDeltaY()>0) {v.setTileSize(1);}
-			if(e.getDeltaY()<0&&v.cellSize>3) {v.setTileSize(-1);}
+			if(e.getDeltaY()<0&&v.getTileSize()>3) {v.setTileSize(-1);}
 			
 			/*double postXTiles = v.getXsize()/v.getTileSize();
 			double postYTiles = v.getYsize()/v.getTileSize();
@@ -131,7 +131,7 @@ public class MovableCanvas extends Canvas{
 	public void iterate() {
 		v.iterate();
 		if(!heatMap){redraw(g);}
-		v.grid.updateNeighborsAll();
+		v.getGrid().updateNeighborsAll();
 		if(heatMap){redraw(g);}
 	}
 	
@@ -154,7 +154,7 @@ public class MovableCanvas extends Canvas{
 		
 		//**BACKGROUND**//
 		g.setFill(heatMap ? CB.heatMap[0]: CB.deadCell);
-		g.fillRect(0, 0, v.xSize, v.ySize);
+		g.fillRect(0, 0, v.getXsize(), v.getYsize());
 		
 		//**BORDER**//
 		if(borderOn){
@@ -180,7 +180,7 @@ public class MovableCanvas extends Canvas{
 	        for(Cell c: seen) {
 	        	int heat = c.getNeighbors();
 	        	g.setFill(CB.heatMap[heat]);
-	        	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) 
+	        	g.fillRect((c.getX()*v.getTileSize())- v.getCurrX(), (c.getY()*v.getTileSize()) 
 	        	- v.getCurrY(), size, size);
 	        	
 	        }
@@ -189,12 +189,10 @@ public class MovableCanvas extends Canvas{
 	       
 	        for(Cell c: seen) {
 	        	
-	        	
-	        	
 	        	if(c.getAge()!=-1){
 	        		
-	        		double x = (c.getX()*v.cellSize)- v.getCurrX();
-	        		double y = (c.getY()*v.cellSize) - v.getCurrY();
+	        		double x = (c.getX()*v.getTileSize())- v.getCurrX();
+	        		double y = (c.getY()*v.getTileSize()) - v.getCurrY();
 	        		//double[] xPoints = {x,x,x+size,x+size};//{x, x+(size/2), x+size, x+(size/2)};
 					//double[] yPoints = {y,y+size,y,y+size};//{y+(size/2), y, y+(size/2), y+size};
 					//g.fillPolygon(xPoints, yPoints, 4);
@@ -202,6 +200,7 @@ public class MovableCanvas extends Canvas{
 	        		
 	        		g.setFill(age ?CB.deadCell.interpolate(CB.aliveCell,((double)c.getAge())/10 +.1): CB.aliveCell);
 	        		g.fillRect(x,y, size, size);
+	        		
 	        	}
 	        		
 	        }
@@ -225,20 +224,20 @@ public class MovableCanvas extends Canvas{
 	
 	public void drawXRange(GraphicsContext g) {	
 		g.setFill(CB.sideBG);
-		g.fillRect(v.xSize-170, v.getYsize()-35, 1, 35);
+		g.fillRect(v.getXsize()-170, v.getYsize()-35, 1, 35);
 		
 		g.setFill(CB.sideHL);	
-		g.fillText("["+new DecimalFormat("#").format(v.startX/v.cellSize)+"-"+
-				new DecimalFormat("#").format((v.startX+v.xSize)/v.cellSize)+"]", v.xSize-130, v.getYsize()-19); 
+		g.fillText("["+new DecimalFormat("#").format(v.getCurrX()/v.getTileSize())+"-"+
+				new DecimalFormat("#").format((v.getCurrX()+v.getXsize())/v.getTileSize())+"]", v.getXsize()-130, v.getYsize()-19); 
 	}
 	
 	public void drawYRange(GraphicsContext g) {
 		g.setFill(CB.sideBG);
-		g.fillRect(v.xSize-90, v.getYsize()-35, 1, 35);
+		g.fillRect(v.getXsize()-90, v.getYsize()-35, 1, 35);
 		
 		g.setFill(CB.sideHL);
-		g.fillText("["+new DecimalFormat("#").format(v.startY/v.cellSize)+"-"+
-				new DecimalFormat("#").format((v.startY+v.ySize)/v.cellSize)+"]", v.xSize-50, v.getYsize()-19); 
+		g.fillText("["+new DecimalFormat("#").format(v.getCurrX()/v.getTileSize())+"-"+
+				new DecimalFormat("#").format((v.getCurrX()+v.getCurrY())/v.getTileSize())+"]", v.getXsize()-50, v.getYsize()-19); 
 	}
 	
 	public void drawCoords(double x, double y, GraphicsContext g) {

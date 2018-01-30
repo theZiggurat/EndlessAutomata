@@ -12,8 +12,8 @@ import java.util.Set;
 
 public class ViewPort {
 	
-	public double cellSize, startX, startY, xSize, ySize;
-	public Grid grid;
+	private double cellSize, startX, startY, xSize, ySize;
+	private Grid grid;
 	
 	
 	/**
@@ -213,6 +213,10 @@ public class ViewPort {
 	
 	public double getTileSize() {
 		return cellSize;
+	}
+	
+	public Grid getGrid() {
+		return grid;
 	}
 	
 	
