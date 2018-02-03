@@ -1,11 +1,13 @@
-package cell.app;
+package cell.canvas;
 
 
 import java.text.DecimalFormat;
 import java.util.Set;
 
+import cell.app.GUI;
 import cell.data.Cell;
 import cell.data.ViewPort;
+import cell.lib.CB;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
@@ -18,7 +20,7 @@ import javafx.scene.text.TextAlignment;
  * @version 1.0
  */
 
-public class MovableCanvas extends Canvas{
+public class Board extends Canvas{
 	
 	
 	
@@ -36,7 +38,7 @@ public class MovableCanvas extends Canvas{
 	 * @param v
 	 */
 	
-	public MovableCanvas(ViewPort v) {
+	public Board(ViewPort v) {
 		
 		this.v = v;
 		this.setWidth(v.xSize);
@@ -84,20 +86,9 @@ public class MovableCanvas extends Canvas{
 		
 		this.setOnScroll(e -> {
 			
-			/*double preXTiles = v.getXsize()/v.getTileSize();
-			double preYTiles = v.getYsize()/v.getTileSize();*/
-			
 			if(e.getDeltaY()>0) {v.setTileSize(1);}
 			if(e.getDeltaY()<0&&v.cellSize>3) {v.setTileSize(-1);}
-			
-			/*double postXTiles = v.getXsize()/v.getTileSize();
-			double postYTiles = v.getYsize()/v.getTileSize();
-			
-			double xTranslate = ((preXTiles - postXTiles)/2 )* v.getTileSize();
-			double yTranslate = ((preYTiles - postYTiles)/2 )* v.getTileSize();
-			
-			v.translate(xTranslate, yTranslate);*/
-			
+		
 			redraw(g);
 		});
 		redraw(g);
@@ -153,6 +144,7 @@ public class MovableCanvas extends Canvas{
 		g.setTextAlign(TextAlignment.CENTER);
 		
 		//**BACKGROUND**//
+		
 		g.setFill(heatMap ? CB.heatMap[0]: CB.deadCell);
 		g.fillRect(0, 0, v.xSize, v.ySize);
 		
@@ -211,6 +203,7 @@ public class MovableCanvas extends Canvas{
         if(debugBar) {
         drawBottomBar(g);
         }
+        
        
 	}
 	
@@ -266,12 +259,25 @@ public class MovableCanvas extends Canvas{
 		redraw(g);
 	}
 	
+	public void toggleBorder(){
+		borderOn = !borderOn;
+		redraw(g);
+	}
+	
 	public boolean isHeat() {
 		return heatMap;
 	}
 	
 	public boolean isAge() {
 		return age;
+	}
+	
+	public boolean isBorder(){
+		return borderOn;
+	}
+	
+	public void draw(){
+		redraw(g);
 	}
 	
 

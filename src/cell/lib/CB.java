@@ -1,4 +1,4 @@
-package cell.app;
+package cell.lib;
 
 import javafx.scene.paint.Color;
 

@@ -1,7 +1,8 @@
-package cell.app;
+package cell.canvas;
 
 import java.util.ArrayList;
 
+import cell.lib.CB;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.TextAlignment;
@@ -18,8 +19,10 @@ public class SelectorCanvas extends Canvas{
 		
 		this.setOnMouseClicked(e -> {
 			int selected = (int)e.getY()/20;
-			if(values.contains(selected)) {values.remove(values.indexOf(selected));}
+			System.out.println(selected);
+			if(values.contains(selected)) {values.remove(values.indexOf(selected));System.out.println("REmoved");}
 			else {values.add(selected);}
+			
 			draw(this.getGraphicsContext2D());
 		});
 	}

@@ -1,6 +1,10 @@
-package cell.app;
+package cell.canvas;
 
 import java.util.List;
+
+import cell.app.GUI;
+import cell.lib.CB;
+import cell.lib.Ruleset;
 import javafx.scene.canvas.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;

@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import cell.app.Ruleset;
+import cell.lib.Ruleset;
 
 /**
  * 12/14/2017
@@ -41,7 +41,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	
 	
 	
-	// STATE CHANGINE METHODS --------------------------------------------------------------------------------------
+	// STATE CHANGING METHODS --------------------------------------------------------------------------------------
 	
 	public void iterate() {
 		if(changed) {updateNeighborsAll(); changed = false;}
@@ -67,6 +67,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 				}
 			}
 		}
+		updateNeighborsAll();
 	}
 	
 	public void updateNeighborsAll() {

@@ -1,18 +1,24 @@
 package cell.app;
 
+
+import cell.canvas.Board;
+import cell.canvas.ScrollableCanvas;
+import cell.canvas.SelectorCanvas;
 import cell.data.Grid;
 import cell.data.ViewPort;
+import cell.lib.CB;
+import cell.lib.Ruleset;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
@@ -31,6 +37,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 // TODO: 
 //  Grid button
@@ -59,13 +66,19 @@ public class GUI extends Application{
 	private static SelectorCanvas s1;
 	private static SelectorCanvas s2;
 	Grid grid;
-	StringProperty sizeX;
 	ViewPort v;
-	MovableCanvas c;
+	Board c;
 	static Label top = new Label("");
-	static boolean editMap = false;
+	public static boolean editMap = false;
+	boolean isRunning = false;
 	
-	public static long TARGET_FPS = 60;
+	static int RATE_DEFAULT = 6;
+	
+	Timeline t;
+	KeyFrame k;
+	Duration d = Duration.millis(500);
+	
+	Slider timeSlider;
 	
 	public static void main(String[] args) {launch();}
 
@@ -88,7 +101,7 @@ public class GUI extends Application{
 		VBox sideMenu = initSideMenu();
 		HBox topMenu = initTopMenu();
 		Pane mainScreen = new Pane();
-		c = new MovableCanvas(v);
+		c = new Board(v);
 		mainScreen.getChildren().add(c);
 		
 		InnerShadow innerShadow = new InnerShadow();
@@ -109,6 +122,17 @@ public class GUI extends Application{
 		mainWindow.setScene(main);
 		mainWindow.initStyle(StageStyle.TRANSPARENT);
 		mainWindow.show();
+		
+		k = new KeyFrame(Duration.millis(1000), e ->{
+			v.iterate();
+			c.draw();
+			
+		});
+		
+		
+		t = new Timeline();
+		t.setCycleCount(Timeline.INDEFINITE);
+		t.getKeyFrames().add(k);
 	}
 	
 	public void reInit() {
@@ -134,6 +158,7 @@ public class GUI extends Application{
 		topButton iterate = new topButton("Iterate", false, false);
 		topButton exit = new topButton("Exit", false, true);
 		topButton clear = new topButton("Clear", false, true);
+		topButton border = new topButton("Border", true, false);
 		
 		h.setOnMouseDragged(e -> {
 			
@@ -159,7 +184,14 @@ public class GUI extends Application{
 		
 		// run button config ----------------------
         run.setOnAction(e -> {
-        	System.out.println("Running");
+        	if(isRunning){
+        		t.stop();
+        		isRunning = false;
+        	}
+        	else{
+        		t.play();
+        		isRunning = true;
+        	}
 		});
         run.setImage("run.png");
         h.getChildren().add(run);
@@ -197,7 +229,7 @@ public class GUI extends Application{
         	}
         	c.toggleHeat();
 		});
-        //heatMap.setImage("heatMap.png");
+        heatMap.setImage("heatMap.png");
         h.getChildren().add(heatMap);
         
         
@@ -213,6 +245,12 @@ public class GUI extends Application{
         });
         //age.setImage("age.png");
         h.getChildren().add(age);
+        
+        // border button config ------------------
+        border.setOnAction(e -> {
+        	c.toggleBorder();
+        });
+        h.getChildren().add(border);
        
         
         
@@ -222,7 +260,7 @@ public class GUI extends Application{
         	c.redraw(c.getGraphicsContext2D());
 		});
         clear.setImage("clear.png");
-        clear.setTranslateX(GAME_WIDTH-(85*7));
+        clear.setTranslateX(GAME_WIDTH-(85*8));
         h.getChildren().add(clear);
         
         
@@ -232,7 +270,7 @@ public class GUI extends Application{
         	mainWindow.close();
 		});
         exit.setImage("exit.png");
-        exit.setTranslateX(GAME_WIDTH-(85*7));
+        exit.setTranslateX(GAME_WIDTH-(85*8));
         h.getChildren().add(exit);
 		
 		
@@ -267,7 +305,7 @@ public class GUI extends Application{
         l2.setFont(new Font("Segoe UI", 10));
     	l2.setTextFill(CB.deadCell);
     	
-    	Label l3 = new Label("Tiling");
+    	Label l3 = new Label("Simulation Speed");
         l3.setTranslateX(25);
         l3.setTranslateY(5);
         l3.setFont(new Font("Segoe UI", 10));
@@ -307,14 +345,32 @@ public class GUI extends Application{
         selector.getChildren().addAll(s1,s2, buttons);
         selector.setPadding(new Insets(15, 5, 5, 5));
         
-        // TODO: CHANGE CELL FILL
+        Label rate = new Label(String.valueOf(RATE_DEFAULT));
+        rate.setTranslateX(25);
+        rate.setTranslateY(5);
+        rate.setFont(new Font("Segoe UI", 10));
+    	rate.setTextFill(CB.deadCell);
         
-        TileCanvas tiler = new TileCanvas();
-        tiler.setTranslateX(5);
-        tiler.setTranslateY(12);
+        timeSlider = new Slider();
+        timeSlider.setMin(1);
+        timeSlider.setMax(20);
+        timeSlider.setValue(5);
+        timeSlider.setMinorTickCount(1);
+        timeSlider.setBlockIncrement(1);
+        timeSlider.valueProperty().addListener(new ChangeListener<Number>(){
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				changeDuration(arg2.intValue());
+				timeSlider.setValue(arg2.intValue());
+				rate.setText(String.valueOf(arg2.intValue()));
+			}
+        	
+        });
         
         
-        v.getChildren().addAll(l1, c, l2, selector, l3, tiler);
+        
+        v.getChildren().addAll(l1, c, l2, selector, l3, timeSlider, rate);
 		v.setBackground(sideBackground);
 		v.setPrefWidth(85);
 		return v;
@@ -335,6 +391,10 @@ public class GUI extends Application{
 		Grid.changeRules(CURRENT_RULE);
 		s1.switchRule(r.survives);
 		s2.switchRule(r.born);
+	}
+	
+	public void changeDuration(int updates){
+		t.setRate(updates);
 	}
 }
 

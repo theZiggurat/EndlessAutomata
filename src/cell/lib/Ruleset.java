@@ -1,4 +1,4 @@
-package cell.app;
+package cell.lib;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,9 +13,9 @@ public class Ruleset {
 	 * Credits to http://psoup.math.wisc.edu/mcell/rullex_life.html for source.
 	 */
 	
-	ArrayList<Integer> survives = new ArrayList<Integer>();
-	ArrayList<Integer> born = new ArrayList<Integer>();
-	String name;
+	public ArrayList<Integer> survives = new ArrayList<Integer>();
+	public ArrayList<Integer> born = new ArrayList<Integer>();
+	public String name;
 	
 	
 	/**
