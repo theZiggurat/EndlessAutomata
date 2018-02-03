@@ -18,7 +18,7 @@ import javafx.scene.text.Font;
 
 /**
  * I don't know CSS (sad, right?) so this is the way I stylize my buttons
- * @author Max Davatelis 
+ * @author Max Davatelis <theZiggurat>
  *
  */
 

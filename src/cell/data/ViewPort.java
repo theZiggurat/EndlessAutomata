@@ -7,7 +7,7 @@ import java.util.Set;
  * 12/14/2017
  * ViewPort.java
  * @author Maximillian Davatelis <theZiggurat>
- * @version 1.1
+ * @version Alpha 2.0
  */
 
 public class ViewPort {

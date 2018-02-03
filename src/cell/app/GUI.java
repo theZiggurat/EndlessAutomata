@@ -38,15 +38,13 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 // TODO: 
-//  Grid button
-//	Rule swticher/editor
+//	Fix rule swticher/editor
 //	Proper zoom
 //	Stats page
 //  Peek button
 //  Save stage
 //  Load stage (maybe in the form of a snapshot feature)
 //	Better editing tools (blueprint or click&drag for square)
-//  Resizing implemented
 //  Wall drawing
 //
 //..2D automata scene with render configurations
@@ -58,7 +56,7 @@ import javafx.util.Duration;
 /**
  * Contains necessary methods for application to run under javafx
  * @author Max Davatelis <theZiggurat>
- * @version 1.2
+ * @version Alpha 2.0
  */
 public class GUI extends Application{
 	

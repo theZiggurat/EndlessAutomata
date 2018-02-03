@@ -17,7 +17,7 @@ import javafx.scene.text.TextAlignment;
 /**
  * Infinitely scrolling canvas that ties with viewport to provide a grid that remembers cell position
  * @author Max Davatelis <theZiggurat>
- * @version 1.2
+ * @version Alpha 2.0
  */
 
 public class Board extends Canvas{
