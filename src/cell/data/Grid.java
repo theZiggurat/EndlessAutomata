@@ -14,16 +14,12 @@ import cell.lib.Ruleset;
  * 12/14/2017
  * Grid.java
  * @author Maximillian_Davatelis <theZiggurat>
- * @version 1.0
+ * @version 1.1
  */
 
 public class Grid extends ConcurrentHashMap<String, Cell>{
 	
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private boolean changed = false;
 	ArrayList<Cell> retArr = new ArrayList<Cell>();
 	static Ruleset Rules;
@@ -31,7 +27,6 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	/**
 	 * Holds all the existing cells that are interesting for interations (is alive
 	 * or has neighbors that are alive). 
-	 * TODO: scrapping old cells with no neighbor to save space
 	 */
 	
 	public Grid(Ruleset Rules) {
@@ -43,33 +38,39 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	
 	// STATE CHANGING METHODS --------------------------------------------------------------------------------------
 	
+	
+	/**
+	 * Goes through all cells in hashmap and updates age based on whether cell survives or not (depending on neighbors)
+	 */
 	public void iterate() {
+		
 		if(changed) {updateNeighborsAll(); changed = false;}
 		Iterator<Cell> i = values().iterator();
+		
 		while(i.hasNext()) {
 			Cell c = i.next();
-			if(c.getAge()!=-1) { //initially alive
-				if(Rules.survives(c)) {
-					c.survive();
-				}
+			
+			// initially alive
+			if(c.getAge()!=-1) { 
+				if(Rules.survives(c)) {c.survive();}
 				else {
 					c.kill();
 					remove(c.getKey());
 				}
 			}
 			
-			else { //initially dead
-				if(Rules.born(c)) {
-					c.survive();
-				}
-				else{
-					remove(c.getKey());
-				}
+			// initially dead
+			else { 
+				if(Rules.born(c)) {c.survive();}
+				else {remove(c.getKey());}
 			}
 		}
 		updateNeighborsAll();
 	}
 	
+	/**
+	 * 
+	 */
 	public void updateNeighborsAll() {
 		Set<Cell> set = buildSet();
 		Iterator<Cell> iter = set.iterator();
@@ -201,15 +202,24 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 		return Get(tuple);
 	}
 	
+	/**
+	 * Clears grid of all entries
+	 */
 	public void clearAll() {
 		clear();
 	}
 	
+	/**
+	 * Changes grid ruleset to input rule
+	 * @param r Ruleset for grid to be switched to
+	 */
 	public static void changeRules(Ruleset r){
 		Rules = r;
 	}
 	
-	
+	/**
+	 * Enables changed flag to be used if mouse input changes grid state
+	 */
 	public void changed() {
 		changed = true;
 	}
