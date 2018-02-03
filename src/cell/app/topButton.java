@@ -43,7 +43,7 @@ public class topButton extends Button {
 		setText(label);
 		setBackground(null);
     	setBorder(left? leftButtonDef:topButtonDef);
-    	setPrefHeight(50);
+    	setPrefHeight(52);
     	setPrefWidth(85);
     	setFont(new Font("Segoe UI", 9));
     	setTextFill(Color.web("#ECEFF1"));

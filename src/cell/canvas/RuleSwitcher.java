@@ -9,14 +9,14 @@ import javafx.scene.canvas.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-public class ScrollableCanvas extends Canvas{
+public class RuleSwitcher extends Canvas{
 	
 	List<Ruleset> Rules; 
 	double maxSize = Ruleset.allRules.size()*20;
 	double currPos = 0;
 	int selected = 0;
 	
-	public ScrollableCanvas(List <Ruleset> Rules) {
+	public RuleSwitcher(List <Ruleset> Rules) {
 		this.Rules = Rules;
 		this.setWidth(75);
 		this.setHeight(200);
@@ -65,11 +65,7 @@ public class ScrollableCanvas extends Canvas{
 			}
 			counter++;
 		}
-		
-		// scroll bar
-		
-		//g.setFill(CB.topBG);
-		//g.fillRect(73, (currPos/maxSize)*200, 2, (10/(double)Ruleset.allRules.size())*200);
+
 		
 		
 	}

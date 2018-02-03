@@ -17,15 +17,21 @@ import javafx.scene.text.TextAlignment;
 /**
  * Infinitely scrolling canvas that ties with viewport to provide a grid that remembers cell position
  * @author Max Davatelis <theZiggurat>
- * @version 1.0
+ * @version 1.2
  */
 
 public class Board extends Canvas{
 	
-	
-	
-	double pressedX, pressedY, lastY, lastX, translateX, translateY, lastMouseX, lastMouseY;
-	boolean clicked, debugBar = true, borderOn = true, heatMap = false, age = false;
+	private double pressedX, 
+	pressedY, lastY, 
+	lastX, translateX, 
+	translateY, lastMouseX, 
+	lastMouseY;
+	private boolean clicked, 
+	debugBar = true, 
+	borderOn = true, 
+	heatMap = false, 
+	age = false;
 
 	Font onScreen;
 	GraphicsContext g;
@@ -46,7 +52,10 @@ public class Board extends Canvas{
 		g = this.getGraphicsContext2D();
 		
 		
-		//**EVENT HANDLERS**//
+		//**EVENT HANDLERS**// ---------------------------------------------------
+	
+		 
+		// draws a single cell on mouse press
 		
 		setOnMousePressed(e ->{
 			
@@ -62,8 +71,7 @@ public class Board extends Canvas{
 			}
 		});
 		
-		setOnMouseReleased(e -> {
-		});
+		// draws many cells on mouse hold
 		
 		setOnMouseDragged(e ->{
 			if(GUI.editMap) {
@@ -84,6 +92,8 @@ public class Board extends Canvas{
 			redraw(g);
 		});
 		
+		// zooms in and out of the canvas
+		
 		this.setOnScroll(e -> {
 			
 			if(e.getDeltaY()>0) {v.setTileSize(1);}
@@ -92,6 +102,8 @@ public class Board extends Canvas{
 			redraw(g);
 		});
 		redraw(g);
+		
+		// displays mouse coordinates in debug bar
 		
 		this.setOnMouseMoved(e ->{
 			if(debugBar) {
@@ -107,7 +119,7 @@ public class Board extends Canvas{
 	
 	/**
 	 * Throws a coordinate from event or refresh to the viewport
-	 * @param wow Coord
+	 * @param x,y Coord
 	 * @return Whether or not the cell was added
 	 */
 	public boolean throwCoord(double x, double y) {
@@ -126,16 +138,11 @@ public class Board extends Canvas{
 		if(heatMap){redraw(g);}
 	}
 	
-	
 	/**
-	 * Refreshes Canvas size to new constraints and updates viewport in the process
+	 * Main rendering call for the canvas. 
+	 * Handles pretty much everything on the main screen
+	 * @param g Graphics Context
 	 */
-	public void resize(double w, double h) {
-		// TODO
-	}
-	
-	
-	// RENDER CANVAS ----------------------------------------------------------------------------------
 	
 	public void redraw(GraphicsContext g) {
 		double size = v.getTileSize();
@@ -143,12 +150,13 @@ public class Board extends Canvas{
 		g.clearRect(0, 0, v.getXsize(), v.getYsize());
 		g.setTextAlign(TextAlignment.CENTER);
 		
-		//**BACKGROUND**//
+		//**BACKGROUND**// -----------------------------------------------------
 		
 		g.setFill(heatMap ? CB.heatMap[0]: CB.deadCell);
 		g.fillRect(0, 0, v.xSize, v.ySize);
 		
-		//**BORDER**//
+		//**BORDER**// ---------------------------------------------------------
+		
 		if(borderOn){
 			g.setFill(heatMap ? CB.heatMap[1]:(borderOn ? CB.borderCell: CB.deadCell));
 	        double currX = -v.getCurrX()%v.getTileSize();
@@ -165,11 +173,15 @@ public class Board extends Canvas{
 	        }
 		}
         
-        //**ALIVE CELL**//
+        //**ALIVE CELL**// -----------------------------------------------------
+		
 		Set<Cell> seen = v.gatherSeen();
+		
+		// if heat map is enabled
 		
 		if(heatMap){
 	        for(Cell c: seen) {
+	        	
 	        	int heat = c.getNeighbors();
 	        	g.setFill(CB.heatMap[heat]);
 	        	g.fillRect((c.getX()*v.cellSize)- v.getCurrX(), (c.getY()*v.cellSize) 
@@ -177,25 +189,22 @@ public class Board extends Canvas{
 	        	
 	        }
 		}
+		
+		// if heat map is disabled
+		
 		else{
 	       
 	        for(Cell c: seen) {
-	        	
-	        	
-	        	
+
 	        	if(c.getAge()!=-1){
 	        		
 	        		double x = (c.getX()*v.cellSize)- v.getCurrX();
 	        		double y = (c.getY()*v.cellSize) - v.getCurrY();
-	        		//double[] xPoints = {x,x,x+size,x+size};//{x, x+(size/2), x+size, x+(size/2)};
-					//double[] yPoints = {y,y+size,y,y+size};//{y+(size/2), y, y+(size/2), y+size};
-					//g.fillPolygon(xPoints, yPoints, 4);
-	        		
-	        		
+
 	        		g.setFill(age ?CB.deadCell.interpolate(CB.aliveCell,((double)c.getAge())/10 +.1): CB.aliveCell);
 	        		g.fillRect(x,y, size, size);
-	        	}
 	        		
+	        	}
 	        }
         }
         

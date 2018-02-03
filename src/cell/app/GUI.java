@@ -2,8 +2,8 @@ package cell.app;
 
 
 import cell.canvas.Board;
-import cell.canvas.ScrollableCanvas;
-import cell.canvas.SelectorCanvas;
+import cell.canvas.RuleEditor;
+import cell.canvas.RuleSwitcher;
 import cell.data.Grid;
 import cell.data.ViewPort;
 import cell.lib.CB;
@@ -14,7 +14,6 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -34,7 +33,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -48,7 +46,6 @@ import javafx.util.Duration;
 //  Save stage
 //  Load stage (maybe in the form of a snapshot feature)
 //	Better editing tools (blueprint or click&drag for square)
-//  Maybe actually getting the run to work w/ FPS counter
 //  Resizing implemented
 //  Wall drawing
 //
@@ -57,29 +54,46 @@ import javafx.util.Duration;
 //	Mobile port
 //  
 
+
+/**
+ * Contains necessary methods for application to run under javafx
+ * @author Max Davatelis <theZiggurat>
+ * @version 1.2
+ */
 public class GUI extends Application{
 	
 	//top bar: 60 px    side bar: 85 px
 	
+	// initializing class variables
+	
 	private Stage mainWindow;
 	private int GAME_WIDTH = 1285, GAME_HEIGHT = 760, CELL_SIZE = 15;
 	private static Ruleset CURRENT_RULE = Ruleset.CONWAYS_GAME_OF_LIFE;
-	private static SelectorCanvas s1;
-	private static SelectorCanvas s2;
-	Grid grid;
-	ViewPort v;
-	Board c;
-	static Label top = new Label("");
+	private static RuleEditor s1;
+	private static RuleEditor s2;
+	private Grid grid;
+	private ViewPort v;
+	private Board c;
 	public static boolean editMap = false;
 	boolean isRunning = false;
 	
-	static int RATE_DEFAULT = 6;
+	private static int RATE_DEFAULT = 6;
 	
-	Timeline t;
-	KeyFrame k;
-	Duration d = Duration.millis(500);
+	private Timeline t;
+	private KeyFrame k;
 	
-	Slider timeSlider;
+	private Slider timeSlider;
+	
+	// backgrounds and borders
+	
+	private Background sideBackground = new Background(
+			new BackgroundFill(CB.sideBG,null,null));
+	private Border topBorder1 = new Border(new BorderStroke(CB.topHL, 
+			BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(0, 0, 10,0)), new BorderStroke(CB.aliveCell, 
+					BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(10, 0, 0,0)));
+	private Background topBackground = new Background(new BackgroundFill(CB.topBG,null,null));
+	
+	// starts the program
 	
 	public static void main(String[] args) {launch();}
 
@@ -89,6 +103,12 @@ public class GUI extends Application{
 		initialize(mainWindow);
 	}
 	
+	
+	/**
+	 * Creates main window
+	 * @param mainWindow
+	 */
+	
 	public void initialize(Stage mainWindow) {
 		
 		
@@ -96,7 +116,7 @@ public class GUI extends Application{
 		mainWindow.getIcons().add(new Image("icon.png"));
 		
 		grid = new Grid(CURRENT_RULE);
-		v = new ViewPort(CELL_SIZE, GAME_WIDTH-85, GAME_HEIGHT-60, grid);
+		v = new ViewPort(CELL_SIZE, GAME_WIDTH-85, GAME_HEIGHT-62, grid);
 		
 	
 		VBox sideMenu = initSideMenu();
@@ -134,25 +154,22 @@ public class GUI extends Application{
 		t = new Timeline();
 		t.setCycleCount(Timeline.INDEFINITE);
 		t.getKeyFrames().add(k);
+		t.setRate(RATE_DEFAULT);
 	}
-	
-	public void reInit() {
-		initialize(mainWindow);
-	}
-	
-	
-	static Border topBorder1 = new Border(new BorderStroke(CB.topHL, 
-			BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(0, 0, 10,0)), new BorderStroke(CB.aliveCell, 
-					BorderStrokeStyle.SOLID, new CornerRadii(0), new BorderWidths(10, 0, 0,0)));
-	static Background topBackground = new Background(new BackgroundFill(CB.topBG,null,null));
-	
 	
 	
 	double lastClickedX, lastClickedY, lastPosX, lastPosY;
 	boolean firstSample = true;
 	
+	/**
+	 * Creates HBox with buttons and layout
+	 * @return HBox ready for runtime
+	 */
+	
 	private HBox initTopMenu() {
 		HBox h = new HBox();
+		
+		// all top menu buttons 
 		
 		topButton run = new topButton("Run", true, false);
 		topButton edit = new topButton("Edit", true, false);
@@ -160,6 +177,8 @@ public class GUI extends Application{
 		topButton exit = new topButton("Exit", false, true);
 		topButton clear = new topButton("Clear", false, true);
 		topButton border = new topButton("Border", true, false);
+		
+		// allows window to be moved without OS menu bar
 		
 		h.setOnMouseDragged(e -> {
 			
@@ -172,16 +191,12 @@ public class GUI extends Application{
 			mainWindow.setY(lastClickedY + e.getScreenY());
 		});		
 		
+		// dependent for dragging
+		
 		h.setOnMouseReleased(e -> {
 			firstSample = true;
 		});
 		
-		
-		h.setOnMouseClicked(e -> {
-			if(e.getClickCount()>=2) {
-				fullScreen();
-			}
-		});
 		
 		// run button config ----------------------
         run.setOnAction(e -> {
@@ -244,13 +259,15 @@ public class GUI extends Application{
         	}
         	c.toggleAge();
         });
-        //age.setImage("age.png");
+        age.setImage("age.png");
         h.getChildren().add(age);
+        
         
         // border button config ------------------
         border.setOnAction(e -> {
         	c.toggleBorder();
         });
+        border.setImage("gridLines.png");
         h.getChildren().add(border);
        
         
@@ -274,24 +291,23 @@ public class GUI extends Application{
         exit.setTranslateX(GAME_WIDTH-(85*8));
         h.getChildren().add(exit);
 		
-		
-	
-		h.getChildren().add(top);
 		h.setBorder(topBorder1);
 		h.setBackground(topBackground);
-		h.setPrefHeight(70);
+		h.setPrefHeight(72);
 		
 		return h;
 	}
-	
-	//Border sideBorder = new 
-	Background sideBackground = new Background(new BackgroundFill(CB.sideBG,null,null));
-	
 
+	
+	/**
+	 * Creates the necessary buttons and canvases for the side menu to initialize
+	 * @return VBox ready for runtime
+	 */
 	private VBox initSideMenu() {
+	
 		VBox v = new VBox();
 		
-		
+		// rule switcher group -------------------------------
         
         Label l1 = new Label("Ruleset");
         l1.setTranslateX(25);
@@ -299,27 +315,22 @@ public class GUI extends Application{
         l1.setFont(new Font("Segoe UI", 10));
     	l1.setTextFill(CB.deadCell);
     	
-    	Label l2 = new Label("Configuration");
+        RuleSwitcher c = new RuleSwitcher(Ruleset.allRules);
+        c.setTranslateX(5);
+        c.setTranslateY(10);
+        
+        // rule editor group ----------------------------------
+        
+        Label l2 = new Label("Configuration");
         l2.setTranslateX(10);
         l2.setTranslateY(12);
         l2.setPadding(new Insets(3));
         l2.setFont(new Font("Segoe UI", 10));
     	l2.setTextFill(CB.deadCell);
-    	
-    	Label l3 = new Label("Simulation Speed");
-        l3.setTranslateX(25);
-        l3.setTranslateY(5);
-        l3.setFont(new Font("Segoe UI", 10));
-    	l3.setTextFill(CB.deadCell);
-    	
-        ScrollableCanvas c = new ScrollableCanvas(Ruleset.allRules);
-        c.setTranslateX(5);
-        c.setTranslateY(10);
         
-        HBox selector = new HBox();
-        VBox buttons = new VBox();
-        buttons.setPrefWidth(25);
-        buttons.setMinWidth(25);
+    	
+    	HBox selector = new HBox();
+        HBox buttons = new HBox();;
         
         Button save = new Button("Save");
         Button reset = new Button("Reset");
@@ -327,64 +338,70 @@ public class GUI extends Application{
         buttons.setTranslateX(10);
         
         save.resize(25, 30);
+        save.setBackground(topBackground);
+        save.setTextFill(CB.deadCell);
+        save.setFont(new Font(8));
         reset.resize(25, 30);
-        
-        save.setBackground(sideBackground);
-        reset.setBackground(sideBackground);
-        
-        
-        
-        
-        reset.setTranslateY(15);
+        reset.setBackground(topBackground);
+        reset.setTextFill(CB.deadCell);
+        reset.setFont(new Font(8));
         
         buttons.getChildren().addAll(save, reset);
         
-        s1 = new SelectorCanvas(CURRENT_RULE.survives);
-        s2 = new SelectorCanvas(CURRENT_RULE.born);
-        s2.setTranslateX(5);
+        s1 = new RuleEditor(CURRENT_RULE.survives);
+        s2 = new RuleEditor(CURRENT_RULE.born);
+        s2.setTranslateX(8);
    
-        selector.getChildren().addAll(s1,s2, buttons);
-        selector.setPadding(new Insets(15, 5, 5, 5));
+        selector.getChildren().addAll(s1,s2);
+        selector.setPadding(new Insets(15, 9, 5, 8));
         
-        Label rate = new Label(String.valueOf(RATE_DEFAULT));
-        rate.setTranslateX(25);
-        rate.setTranslateY(5);
-        rate.setFont(new Font("Segoe UI", 10));
-    	rate.setTextFill(CB.deadCell);
+        // slider group ---------------------------------------
         
-        timeSlider = new Slider();
-        timeSlider.setMin(1);
+        VBox sliderBox = new VBox();
+        
+        Label l3 = new Label("Simulation Speed");
+        l3.setTranslateX(4);
+        l3.setTranslateY(5);
+        l3.setFont(new Font("Segoe UI", 10));
+    	l3.setTextFill(CB.deadCell);
+    	
+    	Label rate = new Label(String.valueOf(RATE_DEFAULT)+ " updates/s");
+    	
+    	timeSlider = new Slider();
+        timeSlider.setMin(2);
         timeSlider.setMax(20);
         timeSlider.setValue(5);
         timeSlider.setMinorTickCount(1);
         timeSlider.setBlockIncrement(1);
+        timeSlider.setTranslateY(8);
         timeSlider.valueProperty().addListener(new ChangeListener<Number>(){
 
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				changeDuration(arg2.intValue());
-				timeSlider.setValue(arg2.intValue());
-				rate.setText(String.valueOf(arg2.intValue()));
-			}
-        	
-        });
+ 			@Override
+ 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+ 				changeDuration(arg2.intValue());
+ 				timeSlider.setValue(arg2.intValue());
+ 				rate.setText(String.valueOf(arg2.intValue())+ " updates/s");
+ 			}
+         	
+         });
+       
+        rate.setTranslateX(14);
+        rate.setTranslateY(10);
+        rate.setFont(new Font("Segoe UI", 10));
+    	rate.setTextFill(CB.deadCell);
+    	
+    	sliderBox.getChildren().addAll(l3, timeSlider, rate);
+    	sliderBox.setBackground(topBackground);
+    	sliderBox.setTranslateY(165);
+    	sliderBox.setPrefHeight(57);
         
+        // master VBOX --------------------------------------------------------
         
-        
-        v.getChildren().addAll(l1, c, l2, selector, l3, timeSlider, rate);
+        v.getChildren().addAll(l1, c, l2, 
+        		selector, buttons, sliderBox);
 		v.setBackground(sideBackground);
 		v.setPrefWidth(85);
 		return v;
-	}
-
-	public static void setTop(double d) {
-		top.setText(String.valueOf(d));
-	}
-	
-	public void fullScreen() {
-		Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-		mainWindow.setMaxHeight(bounds.getHeight());
-		mainWindow.setMaximized(!mainWindow.isMaximized());
 	}
 	
 	public static void changeRule(Ruleset r) {
