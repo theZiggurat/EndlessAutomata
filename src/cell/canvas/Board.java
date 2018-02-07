@@ -22,16 +22,19 @@ import javafx.scene.text.TextAlignment;
 
 public class Board extends Canvas{
 	
-	private double pressedX, 
+	private double 
+	pressedX, 
 	pressedY, lastY, 
 	lastX, translateX, 
 	translateY, lastMouseX, 
 	lastMouseY;
-	private boolean clicked, 
+	private boolean 
 	debugBar = true, 
 	borderOn = true, 
 	heatMap = false, 
 	age = false;
+	
+	long totalTime = 0;
 
 	Font onScreen;
 	GraphicsContext g;
@@ -145,6 +148,7 @@ public class Board extends Canvas{
 	 */
 	
 	public void redraw(GraphicsContext g) {
+		long pretime = System.nanoTime();
 		double size = v.getTileSize();
 		g.setFont(Font.font("Helvetica",FontWeight.EXTRA_LIGHT, 13));
 		g.clearRect(0, 0, v.getXsize(), v.getYsize());
@@ -213,7 +217,8 @@ public class Board extends Canvas{
         drawBottomBar(g);
         }
         
-       
+        totalTime = (System.nanoTime() - pretime)/1000000;
+        System.out.println(totalTime);
 	}
 	
 	public void drawBottomBar(GraphicsContext g) {

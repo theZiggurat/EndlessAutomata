@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	private boolean changed = false;
 	ArrayList<Cell> retArr = new ArrayList<Cell>();
 	static Ruleset Rules;
+	long totalTime = 0;
 	
 	/**
 	 * Holds all the existing cells that are interesting for interations (is alive
@@ -43,6 +45,8 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 * Goes through all cells in hashmap and updates age based on whether cell survives or not (depending on neighbors)
 	 */
 	public void iterate() {
+		
+		long pretime = System.nanoTime();
 		
 		if(changed) {updateNeighborsAll(); changed = false;}
 		Iterator<Cell> i = values().iterator();
@@ -66,13 +70,15 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 			}
 		}
 		updateNeighborsAll();
+		totalTime = (System.nanoTime() - pretime)/1000000;
+		debug();
 	}
 	
 	/**
 	 * 
 	 */
 	public void updateNeighborsAll() {
-		Set<Cell> set = buildSet();
+		List<Cell> set = buildSet();
 		Iterator<Cell> iter = set.iterator();
 		
 		Cell curr; int neighbors;
@@ -109,7 +115,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 * Gathers all alive cells and the alive cell's direct neighbors for any given state of the map.
 	 * @return Set of cells that are alive or have neighbors that are alive
 	 */
-	public Set<Cell> buildSet() {
+	public List<Cell> buildSet() {
 	
 		Set <Cell> ret = new HashSet<Cell>();
 		Collection<Cell> forIterating = new HashSet<Cell>();
@@ -125,7 +131,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 				ret.add(q);
 			}
 		}
-		return ret;
+		return new ArrayList<Cell>(ret);
 		
 	}
 	
@@ -229,10 +235,7 @@ public class Grid extends ConcurrentHashMap<String, Cell>{
 	 * Prints to the console for debugging purposes
 	 */
 	public void debug() {
-		System.out.println("Total Cells: "+size());
-		for(Cell c: this.values()){
-			c.fullDebug();
-		}
+		System.out.println(totalTime + "::"+size());
 	}
 	
 	

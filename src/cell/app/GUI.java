@@ -148,7 +148,6 @@ public class GUI extends Application{
 			
 		});
 		
-		
 		t = new Timeline();
 		t.setCycleCount(Timeline.INDEFINITE);
 		t.getKeyFrames().add(k);
@@ -169,12 +168,14 @@ public class GUI extends Application{
 		
 		// all top menu buttons 
 		
-		topButton run = new topButton("Run", true, false);
-		topButton edit = new topButton("Edit", true, false);
-		topButton iterate = new topButton("Iterate", false, false);
-		topButton exit = new topButton("Exit", false, true);
-		topButton clear = new topButton("Clear", false, true);
-		topButton border = new topButton("Border", true, false);
+		topButton run = new topButton("Run", true, false),
+				edit = new topButton("Edit", true, false),
+				iterate = new topButton("Iterate", false, false),
+				exit = new topButton("Exit", false, true),
+				clear = new topButton("Clear", false, true),
+				border = new topButton("Border", true, false),
+				heatMap = new topButton("Heatmap", true, false),
+				age = new topButton("Age", true, false);
 		
 		// allows window to be moved without OS menu bar
 		
@@ -227,13 +228,14 @@ public class GUI extends Application{
         
         // iterate button config -----------------
         iterate.setOnAction(e -> {
-        	c.iterate();
+        	if(!isRunning) {
+        		c.iterate();
+        	}
 		});
         iterate.setImage("iterate.png");
         h.getChildren().add(iterate);
         
-        topButton heatMap = new topButton("Heatmap", true, false);
-        topButton age = new topButton("Age", true, false);
+       
 		
 		// heat button config ------------------
         heatMap.setOnAction(e -> {
